@@ -10,7 +10,6 @@ import Sider from "antd/es/layout/Sider";
 import { useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import UserProfile from "./components/UserProfile";
-import Notification from "./components/Notification";
 
 const ROUTES = [
   {
@@ -47,10 +46,7 @@ export default function App() {
           />
           <h1 className="text-3xl font-bold">Team Manager</h1>
         </div>
-        <div className="flex items-center gap-4">
-          <Notification />
-          <UserProfile />
-        </div>
+        <UserProfile />
       </Header>
       <Layout>
         <Sider
