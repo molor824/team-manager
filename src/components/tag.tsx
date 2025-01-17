@@ -1,7 +1,7 @@
 import React from "react";
 
 type TagProps = {
-  tagName: "HTML" | "CSS" | "JavaScript" | "React";
+  tagName: "JavaScript" | "React";
   selectTag: (tag: string) => void;
   selected: boolean;
 };
