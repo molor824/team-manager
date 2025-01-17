@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Tag from "./tag";
+// import Tag from "./tag";
 
 type TaskFormProps = {
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
@@ -22,19 +22,19 @@ const TaskForm: React.FC<TaskFormProps> = ({ setTasks }) => {
     return taskData.tags.includes(tag);
   };
 
-  const selectTag = (tag: string) => {
-    if (checkTag(tag)) {
-      setTaskData((prev) => ({
-        ...prev,
-        tags: prev.tags.filter((item) => item !== tag),
-      }));
-    } else {
-      setTaskData((prev) => ({
-        ...prev,
-        tags: [...prev.tags, tag],
-      }));
-    }
-  };
+//   const selectTag = (tag: string) => {
+//     if (checkTag(tag)) {
+//       setTaskData((prev) => ({
+//         ...prev,
+//         tags: prev.tags.filter((item) => item !== tag),
+//       }));
+//     } else {
+//       setTaskData((prev) => ({
+//         ...prev,
+//         tags: [...prev.tags, tag],
+//       }));
+//     }
+//   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -67,12 +67,12 @@ const TaskForm: React.FC<TaskFormProps> = ({ setTasks }) => {
         />
 
         <div className="flex items-center justify-between">
-          <div className="flex space-x-2">
+          {/* <div className="flex space-x-2">
             <Tag tagName="HTML" selectTag={selectTag} selected={checkTag("HTML")} />
             <Tag tagName="CSS" selectTag={selectTag} selected={checkTag("CSS")} />
             <Tag tagName="JavaScript" selectTag={selectTag} selected={checkTag("JavaScript")} />
             <Tag tagName="React" selectTag={selectTag} selected={checkTag("React")} />
-          </div>
+          </div> */}
 
           <div className="flex items-center space-x-2">
             <select

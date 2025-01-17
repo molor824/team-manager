@@ -21,12 +21,15 @@ const todo: React.FC = () => {
     setTasks(newTasks);
   };
 
+
   return (
     <Layout className="min-h-screen bg-gray-50">
       <Content className="p-6">
         <Card className="mb-6 shadow-lg">
           <TaskForm setTasks={setTasks} />
         </Card>
+
+        
 
         <Row gutter={[16, 16]} justify="space-evenly" className="mt-6">
           <Col span={8}>
