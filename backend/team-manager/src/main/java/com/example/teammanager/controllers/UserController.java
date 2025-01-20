@@ -1,33 +1,20 @@
 package com.example.teammanager.controllers;
 
 import com.example.teammanager.entities.User;
-import com.example.teammanager.services.UserService;
+import com.example.teammanager.repositories.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @RestController
 public class UserController {
-    private final UserService userService;
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
     @GetMapping("/me")
     public ResponseEntity<User> authenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User)authentication.getPrincipal();
 
         return ResponseEntity.ok(currentUser);
-    }
-    @GetMapping("/")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
     }
 }
