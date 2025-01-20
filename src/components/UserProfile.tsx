@@ -5,21 +5,10 @@ import {
 } from "@ant-design/icons";
 import { Button, Dropdown, Space } from "antd";
 import { useNavigate } from "react-router-dom";
-import { User, UserContext } from "../App";
-import { useContext } from "react";
+import { useUser } from "./UserProvider";
 
 export default function UserProfile() {
-  const [user, setUser] = useContext(UserContext);
-  const getProfile = (user: User) =>
-    user.profileUrl ? (
-      <img
-        src={user.profileUrl}
-        alt={user.username}
-        className="object-cover max-w-[30px]"
-      />
-    ) : (
-      <UserOutlined alt={user.username} />
-    );
+  const { user, setToken } = useUser();
   const navigate = useNavigate();
   const menuItems = [
     {
@@ -34,7 +23,7 @@ export default function UserProfile() {
       label: "Sign out",
       danger: true,
       onClick: () => {
-        setUser(null);
+        setToken("");
         navigate("/signup");
       },
     },
@@ -46,7 +35,7 @@ export default function UserProfile() {
         <Button type="text" size="large">
           <Space>
             <p className="font-bold">{user.username}</p>
-            {getProfile(user)}
+            <UserOutlined alt={user.username} />
           </Space>
         </Button>
       </Dropdown>
