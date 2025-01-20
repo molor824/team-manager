@@ -1,16 +1,18 @@
+// Todo.tsx (Updated)
+
 import React, { useState, useEffect } from "react";
-import { Layout, Card, Row, Col } from "antd";
-import TaskForm from "../components/taskform";
-import TaskColumn from "../components/taskcolumn";
-import { FileOutlined, StarOutlined, CheckOutlined } from "@ant-design/icons";
+import { Layout } from "antd";
+import TaskForm from "../components/TaskForm";
+import TaskColumn from "../components/TaskColumn";
+import { ToolOutlined, PlayCircleOutlined, CheckCircleOutlined } from "@ant-design/icons"; 
 
-const { Content } = Layout;
+const { Header, Content } = Layout;
 
-const todo: React.FC = () => {
-  const oldTasks = localStorage.getItem("tasks");
-  const [tasks, setTasks] = useState<{ task: string; tags: string[]; status: string }[]>(
-    JSON.parse(oldTasks || "[]")
-  );
+const oldTasks = localStorage.getItem("tasks");
+
+const Todo: React.FC = () => {
+  const [tasks, setTasks] = useState<{ id: number; title: string; status: string }[]>(JSON.parse(oldTasks || "[]"));
+  const [activeCard, setActiveCard] = useState<number | null>(null);
 
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -21,48 +23,68 @@ const todo: React.FC = () => {
     setTasks(newTasks);
   };
 
+  const onDrop = (status: string, position: number) => {
+    if (activeCard === null) return;
+
+    const taskToMove = tasks[activeCard];
+    const updatedTasks = tasks.filter((_, index) => index !== activeCard);
+    updatedTasks.splice(position, 0, { ...taskToMove, status });
+    setTasks(updatedTasks);
+  };
+
+  // Define icons based on status
+  const getIconForStatus = (status: string) => {
+    switch (status) {
+      case "todo":
+        return <ToolOutlined />;
+      case "doing":
+        return <PlayCircleOutlined />;
+      case "done":
+        return <CheckCircleOutlined />;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <Layout className="min-h-screen bg-gray-50">
+    <Layout className="min-h-screen bg-gray-100">
+      <Header className="bg-blue-500 text-white text-center text-2xl py-4">
+        Task Management App
+      </Header>
       <Content className="p-6">
-        <Card className="mb-6 shadow-lg">
-          <TaskForm setTasks={setTasks} />
-        </Card>
-
-        
-
-        <Row gutter={[16, 16]} justify="space-evenly" className="mt-6">
-          <Col span={8}>
-            <TaskColumn
-              title="To Do"
-              icon={<FileOutlined className="text-xl" />}
-              tasks={tasks}
-              status="todo"
-              handleDelete={handleDelete}
-            />
-          </Col>
-          <Col span={8}>
-            <TaskColumn
-              title="Doing"
-              icon={<StarOutlined className="text-xl" />}
-              tasks={tasks}
-              status="doing"
-              handleDelete={handleDelete}
-            />
-          </Col>
-          <Col span={8}>
-            <TaskColumn
-              title="Done"
-              icon={<CheckOutlined className="text-xl" />}
-              tasks={tasks}
-              status="done"
-              handleDelete={handleDelete}
-            />
-          </Col>
-        </Row>
+        <TaskForm setTasks={setTasks} />
+        <div className="flex justify-evenly mt-8">
+          <TaskColumn
+            title="To do"
+            icon={getIconForStatus("todo")} // Pass the appropriate icon
+            tasks={tasks.filter((task) => task.status === "todo")}
+            status="todo"
+            handleDelete={handleDelete}
+            setActiveCard={setActiveCard}
+            onDrop={onDrop}
+          />
+          <TaskColumn
+            title="Doing"
+            icon={getIconForStatus("doing")} // Pass the appropriate icon
+            tasks={tasks.filter((task) => task.status === "doing")}
+            status="doing"
+            handleDelete={handleDelete}
+            setActiveCard={setActiveCard}
+            onDrop={onDrop}
+          />
+          <TaskColumn
+            title="Done"
+            icon={getIconForStatus("done")} // Pass the appropriate icon
+            tasks={tasks.filter((task) => task.status === "done")}
+            status="done"
+            handleDelete={handleDelete}
+            setActiveCard={setActiveCard}
+            onDrop={onDrop}
+          />
+        </div>
       </Content>
     </Layout>
   );
 };
 
-export default todo;
+export default Todo;

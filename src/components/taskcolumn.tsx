@@ -1,33 +1,63 @@
+// TaskColumn.tsx (Updated)
+
 import React from "react";
 import { Typography } from "antd";
-import { FileOutlined } from "@ant-design/icons";
-import TaskCard from "./taskcard";
+import DropArea from "./DropArea";
+import TaskCard from "./TaskCard";
 
-type TaskColumnProps = {
+const { Title } = Typography;
+
+interface Task {
+  id: number; // Unique task identifier
+  title: string; // Title of the task
+  status: string; // Status of the task (e.g., "todo", "doing", "done")
+  
+}
+
+
+interface TaskColumnProps {
   title: string;
-  icon?: React.ReactNode;
-  tasks: { task: string; tags: string[]; status: string }[];
+  icon: React.ReactNode; // Change here to React.ReactNode
+  tasks: Task[];
   status: string;
   handleDelete: (index: number) => void;
-};
+  setActiveCard: (index: number | null) => void; 
+  onDrop: (status: string, index: number) => void;
+}
 
-const TaskColumn: React.FC<TaskColumnProps> = ({ title, icon, tasks, status, handleDelete }) => {
+const TaskColumn: React.FC<TaskColumnProps> = ({
+  title,
+  icon,
+  tasks,
+  status,
+  handleDelete,
+  setActiveCard,
+  onDrop,
+}) => {
   return (
-    <section className="bg-white p-4 rounded-lg shadow-md">
-      <Typography.Title level={4} className="flex items-center mb-4">
-        {icon || <FileOutlined className="mr-2 text-lg" />} {title}
-      </Typography.Title>
+    <section className="bg-gray-100 rounded-md shadow-md p-4 space-y-4">
+      <div className="flex items-center space-x-2">
+        <div className="w-8 h-8">{icon}</div> {/* Render icon here */}
+        <Title level={4} className="m-0">
+          {title}
+        </Title>
+      </div>
 
-      {tasks.map((task, index) =>
-        task.status === status ? (
-          <TaskCard
-            key={index}
-            title={task.task}
-            tags={task.tags}
-            handleDelete={handleDelete}
-            index={index}
-          />
-        ) : null
+      <DropArea onDrop={() => onDrop(status, 0)} />
+
+      {tasks.map(
+        (task, index) =>
+          task.status === status && (
+            <React.Fragment key={index}>
+              <TaskCard
+                title={task.title}
+                handleDelete={handleDelete}
+                index={index}
+                setActiveCard={setActiveCard}
+              />
+              <DropArea onDrop={() => onDrop(status, index + 1)} />
+            </React.Fragment>
+          )
       )}
     </section>
   );

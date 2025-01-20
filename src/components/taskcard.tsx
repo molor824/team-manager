@@ -1,37 +1,33 @@
 import React from "react";
-import { Tag as AntTag, Button } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import {  Tooltip } from "antd";
+import { CloseCircleOutlined } from "@ant-design/icons";
 
-type TaskCardProps = {
+interface TaskCardProps {
   title: string;
-  tags: string[];
   handleDelete: (index: number) => void;
   index: number;
-};
+  setActiveCard: (index: number | null) => void;
+}
 
-const TaskCard: React.FC<TaskCardProps> = ({ title, tags, handleDelete, index }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ title, handleDelete, index, setActiveCard }) => {
   return (
-    <article className="w-full min-h-[100px] border border-gray-300 rounded-lg p-4 mb-4 shadow-sm">
-      <p className="text-lg font-semibold mb-4">{title}</p>
+    <div
+      className="w-full min-h-[100px] border border-gray-300 rounded-lg p-4 mb-4 cursor-grab shadow-md bg-white"
+      draggable
+      onDragStart={() => setActiveCard(index)}
+      onDragEnd={() => setActiveCard(null)}
+    >
+      <p className="text-lg font-semibold mb-3">{title}</p>
 
-      <div className="flex items-center justify-between">
-        <div className="flex flex-wrap gap-2">
-          {tags.map((tag, idx) => (
-            <AntTag key={idx} color="blue">
-              {tag}
-            </AntTag>
-          ))}
-        </div>
-
-        <Button
-          type="text"
-          shape="circle"
-          icon={<DeleteOutlined />}
-          onClick={() => handleDelete(index)}
-          className="hover:bg-gray-200"
-        />
+      <div className="flex justify-between items-center">
+        <Tooltip title="Delete Task">
+          <CloseCircleOutlined
+            className="text-xl text-gray-500 hover:text-red-500 transition-colors cursor-pointer"
+            onClick={() => handleDelete(index)}
+          />
+        </Tooltip>
       </div>
-    </article>
+    </div>
   );
 };
 

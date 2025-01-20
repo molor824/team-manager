@@ -61,19 +61,19 @@ const App = () => {
           }))}
         />
       </Sider>
-      <Layout>
-        <Header className="bg-slate-200">
-          <Button
-            type="text"
-            icon={<MenuOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-          />
-        </Header>
-        <Content className="p-8">
+        <Layout>
+          <Header className="bg-slate-200">
+            <Button
+              type="text"
+              icon={<MenuOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+            />
+          </Header>
+          <Content className="p-8">
           <Outlet />
         </Content>
       </Layout>
     </Layout>
   );
 };
-export default App;
+export default App;   

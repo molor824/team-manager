@@ -1,96 +1,100 @@
 import React, { useState } from "react";
-// import Tag from "./tag";
+import { Input, Button, Select, Tag } from "antd";
 
-type TaskFormProps = {
-  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
-};
+const { Option } = Select;
 
-type Task = {
-  task: string;
-  status: "todo" | "doing" | "done";
-  tags: string[];
-};
+interface TaskFormProps {
+  setTasks: React.Dispatch<
+    React.SetStateAction<{ id: number; title: string; status: string }[]>
+  >;
+}
 
 const TaskForm: React.FC<TaskFormProps> = ({ setTasks }) => {
-  const [taskData, setTaskData] = useState<Task>({
-    task: "",
+  const [taskData, setTaskData] = useState({
+    title: "",
     status: "todo",
-    tags: [],
+    tags: [] as string[],
   });
 
-  const checkTag = (tag: string) => {
-    return taskData.tags.includes(tag);
-  };
+  const tagOptions = ["HTML", "CSS", "JavaScript", "React"];
 
-//   const selectTag = (tag: string) => {
-//     if (checkTag(tag)) {
-//       setTaskData((prev) => ({
-//         ...prev,
-//         tags: prev.tags.filter((item) => item !== tag),
-//       }));
-//     } else {
-//       setTaskData((prev) => ({
-//         ...prev,
-//         tags: [...prev.tags, tag],
-//       }));
-//     }
-//   };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (name: string, value: string | string[]) => {
     setTaskData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
+  const handleTagChange = (selectedTags: string[]) => {
+    setTaskData((prev) => ({
+      ...prev,
+      tags: selectedTags,
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setTasks((prev) => [...prev, taskData]);
+
+    const newTask = {
+      id: Date.now(), // Generate a unique ID
+      title: taskData.title,
+      status: taskData.status,
+      tags: taskData.tags,
+    };
+
+    setTasks((prev) => [...prev, newTask]);
+
+    // Reset form fields after adding a task
     setTaskData({
-      task: "",
+      title: "",
       status: "todo",
       tags: [],
     });
   };
 
   return (
-    <header className="flex items-center justify-center border-b border-gray-300 pb-4">
-      <form onSubmit={handleSubmit} className="w-2/5">
-        <input
+    <header className="border-b border-gray-300 py-4 bg-white shadow-sm">
+      <form onSubmit={handleSubmit} className="flex flex-col items-center space-y-4">
+        <Input
           type="text"
-          name="task"
-          value={taskData.task}
-          className="w-full text-lg font-medium bg-gray-100 text-black border border-gray-300 rounded-md p-2 mb-4"
+          name="title"
+          value={taskData.title}
           placeholder="Enter your task"
-          onChange={handleChange}
+          onChange={(e) => handleChange("title", e.target.value)}
+          className="w-2/3"
+          size="large"
         />
 
-        <div className="flex items-center justify-between">
-          {/* <div className="flex space-x-2">
-            <Tag tagName="HTML" selectTag={selectTag} selected={checkTag("HTML")} />
-            <Tag tagName="CSS" selectTag={selectTag} selected={checkTag("CSS")} />
-            <Tag tagName="JavaScript" selectTag={selectTag} selected={checkTag("JavaScript")} />
-            <Tag tagName="React" selectTag={selectTag} selected={checkTag("React")} />
-          </div> */}
+        <div className="flex items-center justify-between w-2/3">
+          <Select
+            mode="multiple"
+            placeholder="Select tags"
+            value={taskData.tags}
+            onChange={handleTagChange}
+            className="w-1/2"
+          >
+            {tagOptions.map((tag) => (
+              <Option key={tag} value={tag}>
+                <Tag>{tag}</Tag>
+              </Option>
+            ))}
+          </Select>
 
-          <div className="flex items-center space-x-2">
-            <select
-              name="status"
+          <div className="flex items-center space-x-4">
+            <Select
               value={taskData.status}
-              className="text-base font-medium border border-gray-500 rounded-md h-10 px-2"
-              onChange={handleChange}
+              onChange={(value) => handleChange("status", value)}
+              className="w-32"
+              size="large"
             >
-              <option value="todo">To do</option>
-              <option value="doing">Doing</option>
-              <option value="done">Done</option>
-            </select>
-            <button
-              type="submit"
-              className="text-base font-medium bg-blue-600 text-white rounded-md h-10 px-4"
-            >
+              <Option value="todo">To do</Option>
+              <Option value="doing">Doing</Option>
+              <Option value="done">Done</Option>
+            </Select>
+
+            <Button type="primary" htmlType="submit" className="bg-blue-500" size="large">
               + Add Task
-            </button>
+            </Button>
           </div>
         </div>
       </form>
