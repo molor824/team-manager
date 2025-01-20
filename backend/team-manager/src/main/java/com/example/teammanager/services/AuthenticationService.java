@@ -4,10 +4,13 @@ import com.example.teammanager.dtos.LoginUserDto;
 import com.example.teammanager.dtos.RegisterUserDto;
 import com.example.teammanager.entities.User;
 import com.example.teammanager.repositories.UserRepository;
+import com.sun.jdi.request.InvalidRequestStateException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class AuthenticationService {
@@ -25,21 +28,25 @@ public class AuthenticationService {
         this.authenticationManager = manager;
     }
 
-    public User signup(RegisterUserDto dto) {
+    public Optional<User> signup(RegisterUserDto dto) {
+        if (userRepository.findByEmail(dto.email()).isPresent()) {
+            return Optional.empty();
+        }
+
         User user = new User();
         user.setEmail(dto.email());
         user.setFullName(dto.fullName());
         user.setPhoneNumber(dto.phoneNumber());
         user.setPassword(passwordEncoder.encode(dto.password()));
 
-        return userRepository.save(user);
+        return Optional.of(userRepository.save(user));
     }
 
-    public User authenticate(LoginUserDto dto) {
+    public Optional<User> authenticate(LoginUserDto dto) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 dto.email(),
                 dto.password()
         ));
-        return userRepository.findByEmail(dto.email()).orElseThrow();
+        return userRepository.findByEmail(dto.email());
     }
 }

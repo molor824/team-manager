@@ -27,16 +27,20 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     public ResponseEntity<User> signup(@RequestBody RegisterUserDto dto) {
-        User registeredUser = authenticationService.signup(dto);
-        return ResponseEntity.ok(registeredUser);
-    }
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginUserDto dto) {
-        User authenticatedUser = authenticationService.authenticate(dto);
-        String jwtToken = jwtService.generateToken(authenticatedUser);
-        LoginResponse response = new LoginResponse(jwtToken, jwtService.getExpirationTime(jwtToken));
-        return ResponseEntity.ok(response);
+        var registeredUser = authenticationService.signup(dto);
+        return registeredUser.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    public record LoginResponse(String token, long expiresIn) {}
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginUserDto dto) {
+        var authenticatedUser = authenticationService.authenticate(dto);
+        return authenticatedUser.map(user -> {
+            String jwtToken = jwtService.generateToken(user);
+            LoginResponse response = new LoginResponse(jwtToken, jwtService.getExpirationTime(jwtToken));
+            return ResponseEntity.ok(response);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    public record LoginResponse(String token, long expiresIn) {
+    }
 }
