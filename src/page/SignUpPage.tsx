@@ -45,11 +45,11 @@ export default function SignUpPage() {
           rules={[
             {
               type: "email",
-              message: "The input is not valid E-Mail!",
+              message: "The input is not a valid E-Mail!",
             },
             {
               required: true,
-              message: "Please input your E-Mail!",
+              message: "The input is required!",
             },
             {
               validator: async (_, value) => {
@@ -71,7 +71,7 @@ export default function SignUpPage() {
           rules={[
             {
               required: true,
-              message: "Please input your full name!",
+              message: "The input is required!",
             },
           ]}
         >
