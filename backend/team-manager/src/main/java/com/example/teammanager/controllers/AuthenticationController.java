@@ -28,7 +28,7 @@ public class AuthenticationController {
     @PostMapping("/signup")
     public ResponseEntity<User> signup(@RequestBody RegisterUserDto dto) {
         var registeredUser = authenticationService.signup(dto);
-        return registeredUser.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return registeredUser.map(ResponseEntity::ok).orElse(ResponseEntity.badRequest().build());
     }
 
     @PostMapping("/login")
