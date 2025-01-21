@@ -9,6 +9,7 @@ import NotFoundPage from "./page/NotFoundPage";
 import { ConfigProvider, ThemeConfig } from "antd";
 import { UserProvider } from "./components/UserProvider";
 import SignUpPage from "./page/SignUpPage";
+import LogInPage from "./page/LogInPage";
 
 export const API_URL = "http://localhost:8080/api";
 const themeConfig: ThemeConfig = {
@@ -31,6 +32,7 @@ createRoot(document.getElementById("root")!).render(
             <Route element={<App />}>
               <Route index element={<HomePage />} />
               <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/login" element={<LogInPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>
