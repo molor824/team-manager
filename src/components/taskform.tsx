@@ -16,7 +16,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ setTasks }) => {
     tags: [] as string[],
   });
 
-  const tagOptions = ["HTML", "CSS", "JavaScript", "React"];
+  const tagOptions = ["ajil1", "ajil2", "ajil3", "ajil4"];
 
   const handleChange = (name: string, value: string | string[]) => {
     setTaskData((prev) => ({
@@ -34,6 +34,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ setTasks }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
 
     const newTask = {
       id: Date.now(), // Generate a unique ID
@@ -41,6 +42,11 @@ const TaskForm: React.FC<TaskFormProps> = ({ setTasks }) => {
       status: taskData.status,
       tags: taskData.tags,
     };
+    // Check title is empthy or not 
+    if (taskData.title.trim() === "") {
+      alert("Please enter a task title!");
+      return; // Prevent the form from submitting
+    }
 
     setTasks((prev) => [...prev, newTask]);
 
@@ -50,6 +56,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ setTasks }) => {
       status: "todo",
       tags: [],
     });
+
+    
   };
 
   return (

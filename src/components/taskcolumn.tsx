@@ -1,4 +1,3 @@
-// TaskColumn.tsx (Updated)
 
 import React from "react";
 import { Typography } from "antd";
@@ -43,19 +42,19 @@ const TaskColumn: React.FC<TaskColumnProps> = ({
         </Title>
       </div>
 
-      <DropArea onDrop={() => onDrop(status, 0)} />
+      <DropArea onDrop={() => onDrop(status, -1)} />
 
       {tasks.map(
         (task, index) =>
           task.status === status && (
-            <React.Fragment key={index}>
+            <React.Fragment key={task.id}>
               <TaskCard
                 title={task.title}
                 handleDelete={handleDelete}
                 index={index}
                 setActiveCard={setActiveCard}
               />
-              <DropArea onDrop={() => onDrop(status, index + 1)} />
+              <DropArea onDrop={() => onDrop(status, index )} />
             </React.Fragment>
           )
       )}
