@@ -27,7 +27,7 @@ export default function LogInPage() {
 
   return (
     <Card className="max-w-[400px] mx-auto">
-      <h1 className="text-4xl font-bold">Create an account</h1>
+      <h1 className="text-4xl font-bold">Log In</h1>
       <Space>
         <p>Don't have an account?</p>
         <Link to="/signup" className="text-blue-500 hover:underline">
