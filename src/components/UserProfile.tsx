@@ -3,7 +3,7 @@ import {
   UserDeleteOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Button, Dropdown, Space } from "antd";
+import { Button, Dropdown } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "./UserProvider";
 
@@ -14,17 +14,17 @@ export default function UserProfile() {
     {
       key: "edit",
       icon: <EditFilled />,
-      label: "Edit profile",
+      label: "Edit Profile",
       onClick: () => navigate("/edit"),
     },
     {
-      key: "signout",
+      key: "logout",
       icon: <UserDeleteOutlined />,
-      label: "Sign out",
+      label: "Log Out",
       danger: true,
       onClick: () => {
         setToken("");
-        navigate("/signup");
+        navigate("/login");
       },
     },
   ];
@@ -33,19 +33,19 @@ export default function UserProfile() {
     <>
       <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
         <Button type="text" size="large">
-          <Space>
-            <div>
+          <div className="flex items-center gap-4">
+            <div className="text-end leading-none">
               <p className="font-bold">{user.fullName}</p>
-              <p className="text-gray-600">{user.email}</p>
+              <p className="text-gray-600 text-sm">{user.email}</p>
             </div>
             <UserOutlined alt={user.fullName} />
-          </Space>
+          </div>
         </Button>
       </Dropdown>
     </>
   ) : (
-    <Button type="primary" size="large" onClick={() => navigate("/signup")}>
-      Sign Up
+    <Button type="primary" size="large" onClick={() => navigate("/login")}>
+      Log In
     </Button>
   );
 }

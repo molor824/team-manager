@@ -1,7 +1,7 @@
 import { Button, Card, Form, Input } from "antd";
 import { useState } from "react";
 import { useUser } from "../components/UserProvider";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { postApi } from "../tools/fetchApi";
 
 export default function SignUpPage() {
@@ -28,17 +28,24 @@ export default function SignUpPage() {
   };
 
   return (
-    <Card>
+    <Card className="max-w-[400px] mx-auto">
+      <h1 className="text-4xl font-bold">Create an account</h1>
+      <div className="flex gap-2">
+        <p>Already have an account?</p>
+        <Link to="/login" className="text-blue-500 hover:underline">
+          Log In
+        </Link>
+      </div>
+      <p className="text-red-500" hidden={!accountExists}>
+        The account already exists!
+      </p>
       <Form
-        autoComplete="off"
+        className="mt-8"
         layout="vertical"
         onFinish={handleOnFinish}
         disabled={loading}
         form={form}
       >
-        <p className="text-red-500" hidden={!accountExists}>
-          The account already exists!
-        </p>
         <Form.Item
           label="E-Mail"
           name="email"

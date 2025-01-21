@@ -1,8 +1,8 @@
-import { Button, Card, Form, Input } from "antd";
+import { Button, Card, Form, Input, Space } from "antd";
 import { useState } from "react";
 import { postApi } from "../tools/fetchApi";
 import { useUser } from "../components/UserProvider";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function LogInPage() {
   const [loading, setLoading] = useState(false);
@@ -26,16 +26,23 @@ export default function LogInPage() {
   };
 
   return (
-    <Card>
+    <Card className="max-w-[400px] mx-auto">
+      <h1 className="text-4xl font-bold">Create an account</h1>
+      <Space>
+        <p>Don't have an account?</p>
+        <Link to="/signup" className="text-blue-500 hover:underline">
+          Sign Up
+        </Link>
+      </Space>
+      <p className="text-red-500" hidden={!invalidAccount}>
+        Invalid account or password!
+      </p>
       <Form
-        autoComplete="off"
+        className="mt-8"
         layout="vertical"
         onFinish={handleOnFinish}
         disabled={loading}
       >
-        <p className="text-red-500" hidden={!invalidAccount}>
-          Invalid account or password!
-        </p>
         <Form.Item
           label="E-Mail"
           name="email"
