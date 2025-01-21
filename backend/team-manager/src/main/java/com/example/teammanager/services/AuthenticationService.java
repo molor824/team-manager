@@ -4,13 +4,13 @@ import com.example.teammanager.dtos.LoginUserDto;
 import com.example.teammanager.dtos.RegisterUserDto;
 import com.example.teammanager.entities.User;
 import com.example.teammanager.repositories.UserRepository;
-import com.sun.jdi.request.InvalidRequestStateException;
+import org.apache.coyote.BadRequestException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class AuthenticationService {
@@ -28,9 +28,9 @@ public class AuthenticationService {
         this.authenticationManager = manager;
     }
 
-    public Optional<User> signup(RegisterUserDto dto) {
+    public User signup(RegisterUserDto dto) throws ResponseStatusException {
         if (userRepository.findByEmail(dto.email()).isPresent()) {
-            return Optional.empty();
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
         User user = new User();
@@ -39,14 +39,19 @@ public class AuthenticationService {
         user.setPhoneNumber(dto.phoneNumber());
         user.setPassword(passwordEncoder.encode(dto.password()));
 
-        return Optional.of(userRepository.save(user));
+        return userRepository.save(user);
     }
 
-    public Optional<User> authenticate(LoginUserDto dto) {
+    public boolean userExists(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+    public User authenticate(LoginUserDto dto) throws ResponseStatusException {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 dto.email(),
                 dto.password()
         ));
-        return userRepository.findByEmail(dto.email());
+        return userRepository.findByEmail(dto.email())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 }
