@@ -2,38 +2,43 @@ import { Button, Card, Form, Input } from "antd";
 import { useState } from "react";
 import { useUser } from "../components/UserProvider";
 import { useNavigate } from "react-router-dom";
-import { getApi, postApi } from "../tools/fetchApi";
+import { postApi } from "../tools/fetchApi";
 
-type FormType = {
-  email: string;
-  fullName: string;
-  phoneNumber: string;
-  password: string;
-};
 export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
+  const [accountExists, setAccountExists] = useState(false);
   const { setToken } = useUser();
+  const [form] = Form.useForm();
   const navigate = useNavigate();
-  const handleOnFinish = (data: FormType) => {
+  const handleOnFinish = (data: any) => {
     setLoading(true);
+    setAccountExists(false);
+    console.log(data);
     postApi("/auth/signup", data)
       .then((res) => {
         console.log(res);
         setToken(res.token);
         navigate("/");
       })
-      .catch(console.error);
+      .catch((_) => {
+        setLoading(false);
+        setAccountExists(true);
+        form.resetFields();
+      });
   };
 
   return (
     <Card>
       <Form
         autoComplete="off"
-        name="basic"
         layout="vertical"
         onFinish={handleOnFinish}
         disabled={loading}
+        form={form}
       >
+        <p className="text-red-500" hidden={!accountExists}>
+          The account already exists!
+        </p>
         <Form.Item
           label="E-Mail"
           name="email"
@@ -46,13 +51,6 @@ export default function SignUpPage() {
             {
               type: "email",
               message: "The input is not a valid E-Mail!",
-            },
-            {
-              validator: (_, value) =>
-                getApi(`/auth/exists?user=${value}`).then((res) =>
-                  res === true ? Promise.reject() : Promise.resolve()
-                ),
-              message: "This E-Mail already have an account!",
             },
           ]}
         >

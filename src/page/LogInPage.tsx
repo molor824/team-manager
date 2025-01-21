@@ -33,11 +33,8 @@ export default function LogInPage() {
         onFinish={handleOnFinish}
         disabled={loading}
       >
-        <p
-          className="text-red-500"
-          style={{ display: invalidAccount ? "block" : "none" }}
-        >
-          Invalid account or password
+        <p className="text-red-500" hidden={!invalidAccount}>
+          Invalid account or password!
         </p>
         <Form.Item
           label="E-Mail"
