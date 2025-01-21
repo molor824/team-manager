@@ -8,7 +8,9 @@ import HomePage from "./page/HomePage";
 import NotFoundPage from "./page/NotFoundPage";
 import { ConfigProvider, ThemeConfig } from "antd";
 import { UserProvider } from "./components/UserProvider";
+import SignUpPage from "./page/SignUpPage";
 
+export const API_URL = "http://localhost:8080/api";
 const themeConfig: ThemeConfig = {
   token: {
     colorPrimary: "#997549",
@@ -28,6 +30,7 @@ createRoot(document.getElementById("root")!).render(
           <Routes>
             <Route element={<App />}>
               <Route index element={<HomePage />} />
+              <Route path="/signup" element={<SignUpPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>
