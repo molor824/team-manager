@@ -2,10 +2,10 @@ package com.example.teammanager.controllers;
 
 import com.example.teammanager.dtos.LoginUserDto;
 import com.example.teammanager.dtos.RegisterUserDto;
-import com.example.teammanager.entities.User;
 import com.example.teammanager.services.AuthenticationService;
 import com.example.teammanager.services.JwtService;
-import org.springframework.http.ResponseEntity;
+
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/auth")
@@ -16,8 +16,7 @@ public class AuthenticationController {
 
     public AuthenticationController(
             JwtService jwtService,
-            AuthenticationService authenticationService
-    ) {
+            AuthenticationService authenticationService) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
     }
@@ -40,6 +39,6 @@ public class AuthenticationController {
         return new LoginResponse(jwtToken, jwtService.getExpirationTime(jwtToken));
     }
 
-    public record LoginResponse(String token, long expiresIn) {
+    public record LoginResponse(@NonNull String token, long expiresIn) {
     }
 }

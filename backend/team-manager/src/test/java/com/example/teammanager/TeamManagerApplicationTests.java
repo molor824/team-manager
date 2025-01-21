@@ -3,6 +3,9 @@ package com.example.teammanager;
 import com.example.teammanager.controllers.AuthenticationController;
 import com.example.teammanager.dtos.LoginUserDto;
 import com.example.teammanager.dtos.RegisterUserDto;
+
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,14 +23,12 @@ class TeamManagerApplicationTests {
                 "test@mail.com",
                 "Tester John",
                 "test_password_123",
-                "+123456789"
-        ));
+                null));
         assert response != null;
 
         var response1 = authenticationController.login(new LoginUserDto(
                 "test@mail.com",
-                "test_password_123"
-        ));
+                "test_password_123"));
         assert response1 != null;
     }
 }

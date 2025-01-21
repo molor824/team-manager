@@ -4,7 +4,6 @@ import com.example.teammanager.dtos.LoginUserDto;
 import com.example.teammanager.dtos.RegisterUserDto;
 import com.example.teammanager.entities.User;
 import com.example.teammanager.repositories.UserRepository;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,8 +20,7 @@ public class AuthenticationService {
     public AuthenticationService(
             UserRepository repository,
             PasswordEncoder encoder,
-            AuthenticationManager manager
-    ) {
+            AuthenticationManager manager) {
         this.userRepository = repository;
         this.passwordEncoder = encoder;
         this.authenticationManager = manager;
@@ -49,8 +47,7 @@ public class AuthenticationService {
     public User authenticate(LoginUserDto dto) throws ResponseStatusException {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 dto.email(),
-                dto.password()
-        ));
+                dto.password()));
         return userRepository.findByEmail(dto.email())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
