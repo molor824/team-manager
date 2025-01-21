@@ -1,8 +1,8 @@
 import { Button, Card, Form, Input } from "antd";
 import { useState } from "react";
-import { API_URL } from "../main";
 import { useUser } from "../components/UserProvider";
 import { useNavigate } from "react-router-dom";
+import { getApi, postApi } from "../tools/fetchApi";
 
 type FormType = {
   email: string;
@@ -16,12 +16,7 @@ export default function SignUpPage() {
   const navigate = useNavigate();
   const handleOnFinish = (data: FormType) => {
     setLoading(true);
-    fetch(`${API_URL}/auth/signup`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    })
-      .then((res) => (res.status < 400 ? res.json() : Promise.reject(res)))
+    postApi("/auth/signup", data)
       .then((res) => {
         console.log(res);
         setToken(res.token);
@@ -42,24 +37,22 @@ export default function SignUpPage() {
         <Form.Item
           label="E-Mail"
           name="email"
+          validateFirst
           rules={[
-            {
-              type: "email",
-              message: "The input is not a valid E-Mail!",
-            },
             {
               required: true,
               message: "The input is required!",
             },
             {
-              validator: async (_, value) => {
-                return fetch(`${API_URL}/auth/exists?user=${value}`)
-                  .then((res) => res.text())
-                  .then((res) =>
-                    res === "true" ? Promise.reject() : Promise.resolve()
-                  );
-              },
-              message: "This E-Mail already exists!",
+              type: "email",
+              message: "The input is not a valid E-Mail!",
+            },
+            {
+              validator: (_, value) =>
+                getApi(`/auth/exists?user=${value}`).then((res) =>
+                  res === true ? Promise.reject() : Promise.resolve()
+                ),
+              message: "This E-Mail already have an account!",
             },
           ]}
         >
@@ -106,7 +99,7 @@ export default function SignUpPage() {
           <Input.Password placeholder="..." visibilityToggle />
         </Form.Item>
 
-        <Form.Item label={null}>
+        <Form.Item>
           <Button type="primary" htmlType="submit" loading={loading}>
             Sign Up
           </Button>
