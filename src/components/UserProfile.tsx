@@ -34,8 +34,11 @@ export default function UserProfile() {
       <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
         <Button type="text" size="large">
           <Space>
-            <p className="font-bold">{user.username}</p>
-            <UserOutlined alt={user.username} />
+            <div>
+              <p className="font-bold">{user.fullName}</p>
+              <p className="text-gray-600">{user.email}</p>
+            </div>
+            <UserOutlined alt={user.fullName} />
           </Space>
         </Button>
       </Dropdown>

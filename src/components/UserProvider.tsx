@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { getApi } from "../tools/fetchApi";
 
 export type User = {
   fullName: string;
@@ -33,10 +34,7 @@ export function UserProvider({ children }: React.PropsWithChildren) {
   useEffect(() => {
     if (userToken === "") return;
 
-    fetch("http://localhost:8080/users/me", {
-      headers: { Authorization: `Bearer ${userToken}` },
-    })
-      .then((res) => (res.status < 400 ? res.json() : Promise.reject(res)))
+    getApi("/users/me", userToken)
       .then((user) => {
         console.log(user);
         setUser({
