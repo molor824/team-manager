@@ -1,6 +1,7 @@
 package com.example.teammanager.entities;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.NonNull;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -10,10 +11,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Table(name="users")
 @Entity
+@Data
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -47,15 +51,14 @@ public class User implements UserDetails {
     @Column(name = "updated_at", nullable = false)
     private Date updatedAt;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<UserTeamRel> teamMemberships; // Updated name
-    public List<UserTeamRel> getTeamMembership() {
-        return teamMemberships;
+
+    @ManyToMany(mappedBy = "users", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<Team> teams = new HashSet<>();
+
+    public User() {
+        // No-argument constructor
     }
 
-    public void setTeamMembership(List<UserTeamRel> teamMemberships) {
-        this.teamMemberships = teamMemberships;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

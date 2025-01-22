@@ -20,6 +20,11 @@ public class Team {
 
     private String description;
 
-    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserTeamRel> userTeamRel = new HashSet<>();
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "user_team", // Join table name
+            joinColumns = @JoinColumn(name = "team_id"), // Foreign key for Team
+            inverseJoinColumns = @JoinColumn(name = "user_id") // Foreign key for User
+    )
+    private Set<User> users = new HashSet<>();
 }
