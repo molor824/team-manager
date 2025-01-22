@@ -21,24 +21,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-<<<<<<< HEAD
-    public ResponseEntity<User> signup(@RequestBody RegisterUserDto dto) {
-        User registeredUser = authenticationService.signup(dto);
-        return ResponseEntity.ok(registeredUser);
-    }
-
-
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginUserDto dto) {
-        User authenticatedUser = authenticationService.authenticate(dto);
-        String jwtToken = jwtService.generateToken(authenticatedUser);
-        LoginResponse response = new LoginResponse(jwtToken, jwtService.getExpirationTime(jwtToken));
-        return ResponseEntity.ok(response);
-=======
     public LoginResponse signup(@RequestBody RegisterUserDto dto) {
         authenticationService.signup(dto);
         return login(new LoginUserDto(dto.email(), dto.password()));
->>>>>>> 97f10f79cf6795222cbfd7ad7db4946f11098b76
     }
 
     @GetMapping("/exists")

@@ -1,12 +1,8 @@
 package com.example.teammanager.entities;
 
 import jakarta.persistence.*;
-<<<<<<< HEAD
 import lombok.Data;
-import lombok.NonNull;
-=======
 import lombok.Getter;
->>>>>>> 97f10f79cf6795222cbfd7ad7db4946f11098b76
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
