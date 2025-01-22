@@ -35,9 +35,8 @@ public class AuthenticationController {
     public LoginResponse login(@RequestBody LoginUserDto dto) {
         var authenticatedUser = authenticationService.authenticate(dto);
         var jwtToken = jwtService.generateToken(authenticatedUser);
-        return new LoginResponse(jwtToken, jwtService.getExpirationTime(jwtToken));
+        return new LoginResponse(jwtToken);
     }
 
-    public record LoginResponse(@NonNull String token, long expiresIn) {
-    }
+    public record LoginResponse(@NonNull String token) {}
 }
