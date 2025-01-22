@@ -47,6 +47,16 @@ public class User implements UserDetails {
     @Column(name = "updated_at", nullable = false)
     private Date updatedAt;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<UserTeamRel> teamMemberships; // Updated name
+    public List<UserTeamRel> getTeamMembership() {
+        return teamMemberships;
+    }
+
+    public void setTeamMembership(List<UserTeamRel> teamMemberships) {
+        this.teamMemberships = teamMemberships;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
