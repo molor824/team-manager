@@ -13,10 +13,8 @@ export default function SignUpPage() {
   const handleOnFinish = (data: any) => {
     setLoading(true);
     setAccountExists(false);
-    console.log(data);
     postApi("/auth/signup", data)
       .then((res) => {
-        console.log(res);
         setToken(res.token);
         navigate("/");
       })

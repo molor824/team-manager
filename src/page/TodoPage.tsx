@@ -39,8 +39,6 @@ export default function Todo() {
   const onDrop = (status: string) => {
     if (activeCard === null) return;
 
-    console.log(activeCard, status);
-
     tasks[activeCard].status = status;
     setTasks([...tasks]);
   };
