@@ -1,11 +1,9 @@
 import { Card } from "antd";
 
-const Home = () => {
+export default function HomePage() {
   return (
     <Card>
       <h1>Home</h1>
     </Card>
   );
-};
-
-export default Home;
+}
