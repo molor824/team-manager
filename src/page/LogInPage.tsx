@@ -12,10 +12,8 @@ export default function LogInPage() {
   const handleOnFinish = (value: any) => {
     setLoading(true);
     setInvalidAccount(false);
-    console.log(value);
     postApi("/auth/login", value)
       .then((res) => {
-        console.log(res);
         setToken(res.token);
         navigate("/");
       })

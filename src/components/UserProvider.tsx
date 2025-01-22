@@ -36,7 +36,6 @@ export function UserProvider({ children }: React.PropsWithChildren) {
 
     getApi("/users/me", userToken)
       .then((user) => {
-        console.log(user);
         setUser({
           fullName: user.fullName,
           email: user.email,
