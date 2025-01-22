@@ -3,39 +3,28 @@ import {
   UserDeleteOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Button, Dropdown, Space } from "antd";
+import { Button, Dropdown } from "antd";
 import { useNavigate } from "react-router-dom";
-import { User, UserContext } from "../App";
-import { useContext } from "react";
+import { useUser } from "./UserProvider";
 
 export default function UserProfile() {
-  const [user, setUser] = useContext(UserContext);
-  const getProfile = (user: User) =>
-    user.profileUrl ? (
-      <img
-        src={user.profileUrl}
-        alt={user.username}
-        className="object-cover max-w-[30px]"
-      />
-    ) : (
-      <UserOutlined alt={user.username} />
-    );
+  const { user, setToken } = useUser();
   const navigate = useNavigate();
   const menuItems = [
     {
       key: "edit",
       icon: <EditFilled />,
-      label: "Edit profile",
+      label: "Edit Profile",
       onClick: () => navigate("/edit"),
     },
     {
-      key: "signout",
+      key: "logout",
       icon: <UserDeleteOutlined />,
-      label: "Sign out",
+      label: "Log Out",
       danger: true,
       onClick: () => {
-        setUser(null);
-        navigate("/signup");
+        setToken("");
+        navigate("/login");
       },
     },
   ];
@@ -44,16 +33,19 @@ export default function UserProfile() {
     <>
       <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
         <Button type="text" size="large">
-          <Space>
-            <p className="font-bold">{user.username}</p>
-            {getProfile(user)}
-          </Space>
+          <div className="flex items-center gap-4">
+            <div className="text-end leading-none">
+              <p className="font-bold">{user.fullName}</p>
+              <p className="text-gray-600 text-sm">{user.email}</p>
+            </div>
+            <UserOutlined alt={user.fullName} />
+          </div>
         </Button>
       </Dropdown>
     </>
   ) : (
-    <Button type="primary" size="large" onClick={() => navigate("/signup")}>
-      Sign Up
+    <Button type="primary" size="large" onClick={() => navigate("/login")}>
+      Log In
     </Button>
   );
 }

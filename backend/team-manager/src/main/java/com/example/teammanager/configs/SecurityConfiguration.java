@@ -31,9 +31,10 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.cors(config -> config.configurationSource(corsConfigurationSource()));
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(request -> {
-            request.requestMatchers("/auth/**").permitAll();
+            request.requestMatchers("/api/auth/**").permitAll();
             request.anyRequest().authenticated();
         });
         http.sessionManagement(customizer -> {
@@ -43,6 +44,7 @@ public class SecurityConfiguration {
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
