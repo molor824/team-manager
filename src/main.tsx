@@ -4,13 +4,14 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Todo from "./page/TodoPage";
+import TodoPage from "./page/TodoPage";
 import HomePage from "./page/HomePage";
 import NotFoundPage from "./page/NotFoundPage";
-import { ConfigProvider, ThemeConfig } from "antd";
-import { UserProvider } from "./components/UserProvider";
 import SignUpPage from "./page/SignUpPage";
 import LogInPage from "./page/LogInPage";
+import EditProfilePage from "./page/EditProfilePage";
+import { ConfigProvider, ThemeConfig } from "antd";
+import { UserProvider } from "./components/UserProvider";
 
 export const API_URL = "http://localhost:8080/api";
 const themeConfig: ThemeConfig = {
@@ -34,7 +35,8 @@ createRoot(document.getElementById("root")!).render(
               <Route index element={<HomePage />} />
               <Route path="/signup" element={<SignUpPage />} />
               <Route path="/login" element={<LogInPage />} />
-              <Route path="/todo" element={<Todo />} />
+              <Route path="/todo" element={<TodoPage />} />
+              <Route path="/edit-profile" element={<EditProfilePage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>
