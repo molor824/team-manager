@@ -4,20 +4,42 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Home from "./page/Home";
-// import PageNotFound from "./page/PageNotFound";
-import Todo from "./page/Todo"
+import Todo from "./page/Todo";
+import HomePage from "./page/HomePage";
+import NotFoundPage from "./page/NotFoundPage";
+import { ConfigProvider, ThemeConfig } from "antd";
+import { UserProvider } from "./components/UserProvider";
+import SignUpPage from "./page/SignUpPage";
+import LogInPage from "./page/LogInPage";
+
+export const API_URL = "http://localhost:8080/api";
+const themeConfig: ThemeConfig = {
+  token: {
+    colorPrimary: "#997549",
+  },
+  components: {
+    Menu: {
+      activeBarBorderWidth: 0,
+    },
+  },
+};
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
-      <Routes>
-        <Route element={<App />}>
-          <Route index element={<Home />} />
-          <Route path="*" element={<Todo />} />
-          {/* <Route index element={<Todo />} /> */}
-        </Route>
-      </Routes>
+      <UserProvider>
+        <ConfigProvider theme={themeConfig}>
+          <Routes>
+            <Route element={<App />}>
+              <Route index element={<HomePage />} />
+              <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/login" element={<LogInPage />} />
+              <Route path="/todo" element={<Todo />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+          </Routes>
+        </ConfigProvider>
+      </UserProvider>
     </BrowserRouter>
   </StrictMode>
 );
