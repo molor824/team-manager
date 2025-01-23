@@ -15,7 +15,7 @@ export default function UserProfile() {
       key: "edit",
       icon: <EditFilled />,
       label: "Edit Profile",
-      onClick: () => navigate("/edit"),
+      onClick: () => navigate("/edit-profile"),
     },
     {
       key: "logout",
