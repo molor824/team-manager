@@ -1,6 +1,7 @@
 package com.example.teammanager.controllers;
 
 import com.example.teammanager.dtos.TeamDto;
+import com.example.teammanager.dtos.UserDto;
 import com.example.teammanager.entities.Team;
 import com.example.teammanager.services.TeamService;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/teams")
+@RequestMapping("/api/teams")
 @RestController
 public class TeamController {
     private final TeamService teamService;
@@ -19,6 +20,7 @@ public class TeamController {
 
     @PostMapping
     public ResponseEntity<Team> createTeam(@RequestBody TeamDto teamDto) {
+        System.out.println(teamDto);
         Team createdTeam = teamService.createTeam(teamDto);
         return ResponseEntity.ok(createdTeam);
     }
@@ -46,4 +48,15 @@ public class TeamController {
         teamService.deleteTeam(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{teamId}/users")
+    public ResponseEntity<List<UserDto>> getUsersInTeam(@PathVariable Integer teamId) {
+        var users = teamService.getUsersInTeam(teamId); // This should return a Set<User> or List<User>
+        var userDto = users.stream()
+                .map(user -> new UserDto((long) user.getId(), user.getEmail(), user.getFullName())) // Adjust `getFullName()` if necessary
+                .toList();
+        return ResponseEntity.ok(userDto);
+
+    }
+
 }

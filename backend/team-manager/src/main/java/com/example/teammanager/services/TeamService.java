@@ -100,4 +100,5 @@ public class TeamService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
         return user.getTeams();
     }
+
 }
