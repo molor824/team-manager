@@ -7,8 +7,6 @@ import com.example.teammanager.dtos.UserDto;
 import com.example.teammanager.services.AuthenticationService;
 import com.example.teammanager.services.JwtService;
 import com.example.teammanager.services.TeamService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
