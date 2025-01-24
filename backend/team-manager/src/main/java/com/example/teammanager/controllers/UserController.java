@@ -28,8 +28,8 @@ public class UserController {
                 user.getFullName(),
                 user.getEmail(),
                 user.getPhoneNumber(),
-                user.getCreatedAt().getTime(),
-                user.getUpdatedAt().getTime());
+                user.getCreatedAt(),
+                user.getUpdatedAt());
     }
 
     @PutMapping("/edit")

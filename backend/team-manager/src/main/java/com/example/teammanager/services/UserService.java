@@ -1,5 +1,6 @@
 package com.example.teammanager.services;
 
+import com.example.teammanager.exception.UsernameNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -32,5 +33,9 @@ public class UserService {
         user.setPhoneNumber(dto.phoneNumber());
 
         userRepository.save(user);
+    }
+
+    public User findByEmailOrNotFound(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email + " not found"));
     }
 }
