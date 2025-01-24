@@ -3,10 +3,7 @@ package com.example.teammanager.controllers;
 import com.example.teammanager.dtos.ProjectDto;
 import com.example.teammanager.dtos.ProjectResponseDto;
 import com.example.teammanager.dtos.UserDto;
-import com.example.teammanager.exception.NotMemberException;
-import com.example.teammanager.exception.ProjectNotFoundException;
-import com.example.teammanager.exception.UnauthorizedMemberException;
-import com.example.teammanager.exception.UserNotFoundException;
+import com.example.teammanager.exception.*;
 import com.example.teammanager.services.ProjectService;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +20,7 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ProjectResponseDto createProject(@RequestBody ProjectDto projectDto) throws UserNotFoundException {
+    public ProjectResponseDto createProject(@RequestBody ProjectDto projectDto) throws UserNotFoundException, ProjectExistException {
         return new ProjectResponseDto(projectService.createProject(projectDto));
     }
 
