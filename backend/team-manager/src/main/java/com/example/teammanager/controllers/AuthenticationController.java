@@ -48,13 +48,14 @@ public class AuthenticationController {
         var users = teamService.getUsersInTeam(teamId);
 
         // Map User entities to UserDto
-        var userDto = users.stream()
+        // Ensure correct getters
+
+        return users.stream()
                 .map(user -> new UserDto((long) user.getId(), user.getEmail(), user.getFullName())) // Ensure correct getters
                 .toList();
-
-        return userDto;
     }
-    
+
+    @PostMapping("/login")
     public LoginResponseDto login(@RequestBody LoginUserDto dto) {
         var authenticatedUser = authenticationService.authenticate(dto);
         var jwtToken = jwtService.generateToken(authenticatedUser);
