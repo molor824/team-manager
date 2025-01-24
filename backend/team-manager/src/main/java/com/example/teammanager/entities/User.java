@@ -1,9 +1,10 @@
 package com.example.teammanager.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.lang.NonNull;
@@ -23,48 +24,35 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private int id;
+    private Long id;
 
     @Column(name = "full_name", length = 100, nullable = false)
-    @NonNull
-    @Setter
-    @Getter
+    @NotBlank
     private String fullName;
 
     @Column(name = "email", unique = true, length = 100, nullable = false)
-    @NonNull
-    @Setter
-    @Getter
+    @NotBlank
     private String email;
 
-    @Column(name = "password", nullable = false)
-    @NonNull
-    @Setter
+    @Column(name = "password", nullable = false, length = 400)
+    @NotBlank
     private String password;
 
-    @Column(name = "phone_number")
-    @Setter
-    @Getter
+    @Column(name = "phone_number", nullable = false, length = 20)
     private String phoneNumber;
 
     @CreationTimestamp
-    @Column(updatable = false, name = "created_at")
-    @Getter
+    @Column(updatable = false, name = "created_at", nullable = false)
     private Date createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    @Getter
     private Date updatedAt;
 
-
+    @JsonIgnore
+    @ToString.Exclude
     @ManyToMany(mappedBy = "users", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<Team> teams = new HashSet<>();
-
-    public User() {
-        // No-argument constructor
-    }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

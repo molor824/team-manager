@@ -14,15 +14,11 @@ import java.util.List;
 @RequestMapping("/api/auth")
 @RestController
 public class AuthenticationController {
-
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
     private final TeamService teamService; // Inject TeamService for team-related operations
 
-    public AuthenticationController(
-            JwtService jwtService,
-            AuthenticationService authenticationService,
-            TeamService teamService // Constructor injection for TeamService
+    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, TeamService teamService // Constructor injection for TeamService
     ) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
@@ -41,15 +37,14 @@ public class AuthenticationController {
     }
 
     @GetMapping("/{teamId}/users")
-    public List<UserDto> getUsersInTeam(@PathVariable Integer teamId) {
+    public List<UserDto> getUsersInTeam(@PathVariable Long teamId) {
         // Fetch users in the specified team using TeamService
         var users = teamService.getUsersInTeam(teamId);
 
         // Map User entities to UserDto
         // Ensure correct getters
 
-        return users.stream()
-                .map(user -> new UserDto((long) user.getId(), user.getEmail(), user.getFullName())) // Ensure correct getters
+        return users.stream().map(user -> new UserDto(user.getId(), user.getEmail(), user.getFullName())) // Ensure correct getters
                 .toList();
     }
 

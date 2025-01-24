@@ -1,13 +1,13 @@
 package com.example.teammanager.controllers;
 
 import com.example.teammanager.dtos.TeamDto;
+import com.example.teammanager.dtos.TeamResponseDto;
 import com.example.teammanager.dtos.UserDto;
-import com.example.teammanager.entities.Team;
 import com.example.teammanager.services.TeamService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api/teams")
 @RestController
@@ -19,44 +19,36 @@ public class TeamController {
     }
 
     @PostMapping
-    public ResponseEntity<Team> createTeam(@RequestBody TeamDto teamDto) {
-        System.out.println(teamDto);
-        Team createdTeam = teamService.createTeam(teamDto);
-        return ResponseEntity.ok(createdTeam);
+    public TeamResponseDto createTeam(@RequestBody TeamDto teamDto) {
+        return new TeamResponseDto(teamService.createTeam(teamDto));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Team> getTeamById(@PathVariable Integer id) {
-        Team team = teamService.getTeamById(id);
-        return ResponseEntity.ok(team);
+    public TeamResponseDto getTeamById(@PathVariable Long id) {
+        return new TeamResponseDto(teamService.getTeamById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<Team>> getAllTeams() {
-        List<Team> teams = teamService.getAllTeams();
-        return ResponseEntity.ok(teams);
+    public List<TeamResponseDto> getAllTeams() {
+        return teamService.getAllTeams().stream()
+                .map(TeamResponseDto::new).collect(Collectors.toList());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Team> updateTeam(@PathVariable Integer id, @RequestBody TeamDto teamDto) {
-        Team updatedTeam = teamService.updateTeam(id, teamDto);
-        return ResponseEntity.ok(updatedTeam);
+    public TeamResponseDto updateTeam(@PathVariable Long id, @RequestBody TeamDto teamDto) {
+        return new TeamResponseDto(teamService.updateTeam(id, teamDto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTeam(@PathVariable Integer id) {
+    public void deleteTeam(@PathVariable Long id) {
         teamService.deleteTeam(id);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{teamId}/users")
-    public ResponseEntity<List<UserDto>> getUsersInTeam(@PathVariable Integer teamId) {
+    public List<UserDto> getUsersInTeam(@PathVariable Long teamId) {
         var users = teamService.getUsersInTeam(teamId); // This should return a Set<User> or List<User>
-        var userDto = users.stream()
-                .map(user -> new UserDto((long) user.getId(), user.getEmail(), user.getFullName())) // Adjust `getFullName()` if necessary
+        return users.stream()
+                .map(user -> new UserDto(user.getId(), user.getEmail(), user.getFullName())) // Adjust `getFullName()` if necessary
                 .toList();
-        return ResponseEntity.ok(userDto);
-
     }
-
 }
