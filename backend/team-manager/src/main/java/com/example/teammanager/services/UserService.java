@@ -26,11 +26,11 @@ public class UserService {
         return (User) authentication.getPrincipal();
     }
 
-    public User editProfile(EditProfileDto dto) throws ResponseStatusException {
+    public void editProfile(EditProfileDto dto) throws ResponseStatusException {
         var user = getCurrentUser();
         user.setFullName(dto.fullName());
         user.setPhoneNumber(dto.phoneNumber());
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 }
