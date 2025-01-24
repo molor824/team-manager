@@ -3,13 +3,13 @@ package com.example.teammanager.services;
 import com.example.teammanager.dtos.LoginUserDto;
 import com.example.teammanager.dtos.RegisterUserDto;
 import com.example.teammanager.entities.User;
+import com.example.teammanager.exception.UserExistException;
+import com.example.teammanager.exception.UserNotFoundException;
 import com.example.teammanager.repositories.UserRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class AuthenticationService {
@@ -26,9 +26,9 @@ public class AuthenticationService {
         this.authenticationManager = manager;
     }
 
-    public User signup(RegisterUserDto dto) throws ResponseStatusException {
+    public void signup(RegisterUserDto dto) throws UserExistException {
         if (userRepository.findByEmail(dto.email()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new UserExistException("User already exists");
         }
 
         User user = new User();
@@ -37,18 +37,18 @@ public class AuthenticationService {
         user.setPhoneNumber(dto.phoneNumber());
         user.setPassword(passwordEncoder.encode(dto.password()));
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     public boolean userExists(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    public User authenticate(LoginUserDto dto) throws ResponseStatusException {
+    public User authenticate(LoginUserDto dto) throws UserNotFoundException {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 dto.email(),
                 dto.password()));
         return userRepository.findByEmail(dto.email())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> UserNotFoundException.withEmail(dto.email()));
     }
 }

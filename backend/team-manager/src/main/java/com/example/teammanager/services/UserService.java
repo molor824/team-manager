@@ -1,9 +1,8 @@
 package com.example.teammanager.services;
 
-import org.springframework.http.HttpStatus;
+import com.example.teammanager.exception.UserNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.example.teammanager.dtos.EditProfileDto;
 import com.example.teammanager.entities.User;
@@ -17,16 +16,20 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User getCurrentUser() throws ResponseStatusException {
+    public User getCurrentUser() throws UserNotFoundException {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new UserNotFoundException("Failed to find authenticated user");
         }
 
         return (User) authentication.getPrincipal();
     }
 
-    public void editProfile(EditProfileDto dto) throws ResponseStatusException {
+    public User tryGetUserFromEmail(String email) throws UserNotFoundException {
+        return userRepository.findByEmail(email).orElseThrow(() -> UserNotFoundException.withEmail(email));
+    }
+
+    public void editProfile(EditProfileDto dto) throws UserNotFoundException {
         var user = getCurrentUser();
         user.setFullName(dto.fullName());
         user.setPhoneNumber(dto.phoneNumber());

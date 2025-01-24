@@ -3,6 +3,9 @@ package com.example.teammanager.services;
 import com.example.teammanager.dtos.TeamDto;
 import com.example.teammanager.entities.Team;
 import com.example.teammanager.entities.User;
+import com.example.teammanager.exception.TeamExistException;
+import com.example.teammanager.exception.TeamNotFoundException;
+import com.example.teammanager.exception.UserNotFoundException;
 import com.example.teammanager.repositories.TeamRepository;
 import com.example.teammanager.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -21,22 +24,21 @@ public class TeamService {
         this.userRepository = userRepository;
     }
 
-    @Transactional
-    public Team createTeam(TeamDto teamDto) {
-        if (teamRepository.existsByName(teamDto.getName())) {
-            throw new IllegalArgumentException("A team with this name already exists");
+    public Team createTeam(TeamDto teamDto) throws TeamExistException {
+        if (teamRepository.existsByName(teamDto.name())) {
+            throw TeamExistException.withName(teamDto.name());
         }
 
         Team team = new Team();
-        team.setName(teamDto.getName());
-        team.setDescription(teamDto.getDescription());
+        team.setName(teamDto.name());
+        team.setDescription(teamDto.description());
 
         return teamRepository.save(team);
     }
 
-    public Team getTeamById(Integer id) {
+    public Team getTeamById(Long id) throws TeamNotFoundException {
         return teamRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + id));
+                .orElseThrow(() -> TeamNotFoundException.withId(id));
     }
 
     public List<Team> getAllTeams() {
@@ -44,19 +46,19 @@ public class TeamService {
     }
 
     @Transactional
-    public Team updateTeam(Integer id, TeamDto teamDto) {
+    public Team updateTeam(Long id, TeamDto teamDto) {
         Team team = getTeamById(id);
 
-        team.setName(teamDto.getName());
-        team.setDescription(teamDto.getDescription());
+        team.setName(teamDto.name());
+        team.setDescription(teamDto.description());
 
         return teamRepository.save(team);
     }
 
     @Transactional
-    public void deleteTeam(Integer id) {
+    public void deleteTeam(Long id) throws TeamNotFoundException {
         if (!teamRepository.existsById(id)) {
-            throw new IllegalArgumentException("Team not found with ID: " + id);
+            throw TeamNotFoundException.withId(id);
         }
         teamRepository.deleteById(id);
     }
@@ -64,11 +66,12 @@ public class TeamService {
     // New Methods for Managing User-Team Relationships
 
     @Transactional
-    public Team addUserToTeam(Integer teamId, Integer userId) {
+    public Team addUserToTeam(Long teamId, Long userId)
+            throws TeamNotFoundException, UserNotFoundException {
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
+                .orElseThrow(() -> TeamNotFoundException.withId(teamId));
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+                .orElseThrow(() -> UserNotFoundException.withId(userId));
 
         team.getUsers().add(user);
         user.getTeams().add(team); // Synchronize both sides of the relationship
@@ -77,11 +80,12 @@ public class TeamService {
     }
 
     @Transactional
-    public Team removeUserFromTeam(Integer teamId, Integer userId) {
+    public Team removeUserFromTeam(Long teamId, Long userId)
+            throws TeamNotFoundException, UserNotFoundException {
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
+                .orElseThrow(() -> TeamNotFoundException.withId(teamId));
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+                .orElseThrow(() -> UserNotFoundException.withId(userId));
 
         team.getUsers().remove(user);
         user.getTeams().remove(team); // Synchronize both sides of the relationship
@@ -89,16 +93,15 @@ public class TeamService {
         return teamRepository.save(team);
     }
 
-    public Set<User> getUsersInTeam(Integer teamId) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
-        return team.getUsers();
+    public Set<User> getUsersInTeam(Long teamId)
+            throws TeamNotFoundException {
+        return teamRepository.findById(teamId)
+                .orElseThrow(() -> TeamNotFoundException.withId(teamId)).getUsers();
     }
 
-    public Set<Team> getTeamsForUser(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-        return user.getTeams();
+    public Set<Team> getTeamsForUser(Long userId)
+            throws UserNotFoundException {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> UserNotFoundException.withId(userId)).getTeams();
     }
-
 }
