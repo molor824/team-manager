@@ -18,9 +18,6 @@ class TeamManagerApplicationTests {
     private AuthenticationController authenticationController;
 
     @Autowired
-    private ProjectController projectController;
-
-    @Autowired
     private ProjectService projectService;
 
     @Autowired
@@ -50,7 +47,7 @@ class TeamManagerApplicationTests {
     }
 
     @Test
-    void testProjectCreation() throws UserNotFoundException, UserExistException, ProjectNotFoundException, UnauthorizedMemberException, NotMemberException {
+    void testProjectCreation() throws UserNotFoundException, UserExistException, ProjectNotFoundException, UnauthorizedMemberException, NotMemberException, ProjectExistException {
         // Add a user to the team
         var memberResponse = authenticationController.signup(new RegisterUserDto(
                 "user1@mail.com",
@@ -60,7 +57,7 @@ class TeamManagerApplicationTests {
         ));
 
         // sign up
-        var adminResponse = authenticationController.signup(new RegisterUserDto(
+        authenticationController.signup(new RegisterUserDto(
                 "admin@mail.com",
                 "Admin User",
                 "admin_password_123",
