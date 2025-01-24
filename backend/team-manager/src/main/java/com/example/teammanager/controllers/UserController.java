@@ -2,6 +2,7 @@ package com.example.teammanager.controllers;
 
 import com.example.teammanager.dtos.EditProfileDto;
 import com.example.teammanager.dtos.UserResponseDto;
+import com.example.teammanager.exception.UserNotFoundException;
 import com.example.teammanager.services.UserService;
 
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public UserResponseDto authenticatedUser() {
+    public UserResponseDto authenticatedUser() throws UserNotFoundException {
         var user = userService.getCurrentUser();
         return new UserResponseDto(
                 user.getFullName(),
@@ -33,7 +34,7 @@ public class UserController {
     }
 
     @PutMapping("/edit")
-    public HttpStatus editProfile(@RequestBody EditProfileDto dto) {
+    public HttpStatus editProfile(@RequestBody EditProfileDto dto) throws UserNotFoundException {
         userService.editProfile(dto);
         return HttpStatus.ACCEPTED;
     }

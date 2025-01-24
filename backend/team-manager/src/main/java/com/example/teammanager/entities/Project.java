@@ -8,10 +8,10 @@ import lombok.ToString;
 import java.util.HashSet;
 import java.util.Set;
 
-@Table(name = "teams")
+@Table(name = "projects")
 @Entity
 @Data
-public class Team {
+public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
@@ -25,11 +25,17 @@ public class Team {
 
     @JsonIgnore
     @ToString.Exclude
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany
     @JoinTable(
-            name = "user_team", // Join table name
-            joinColumns = @JoinColumn(name = "team_id"), // Foreign key for Team
-            inverseJoinColumns = @JoinColumn(name = "user_id") // Foreign key for User
+            name = "project_member_rel", // Join table name
+            joinColumns = @JoinColumn(name = "project_id"), // Foreign key for Team
+            inverseJoinColumns = @JoinColumn(name = "member_id") // Foreign key for User
     )
-    private Set<User> users = new HashSet<>();
+    private Set<User> members = new HashSet<>();
+
+    @JsonIgnore
+    @ToString.Exclude
+    @ManyToOne
+    @JoinColumn(name = "admin_id", nullable = false)
+    private User admin;
 }

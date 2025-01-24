@@ -25,8 +25,12 @@ public class UserService {
         return (User) authentication.getPrincipal();
     }
 
-    public User tryGetUserFromEmail(String email) throws UserNotFoundException {
+    public User getUserByEmail(String email) throws UserNotFoundException {
         return userRepository.findByEmail(email).orElseThrow(() -> UserNotFoundException.withEmail(email));
+    }
+
+    public User getUserById(Long id) throws UserNotFoundException {
+        return userRepository.findById(id).orElseThrow(() -> UserNotFoundException.withId(id));
     }
 
     public void editProfile(EditProfileDto dto) throws UserNotFoundException {
