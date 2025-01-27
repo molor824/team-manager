@@ -3,8 +3,7 @@ package com.example.teammanager.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.lang.NonNull;
@@ -19,7 +18,10 @@ import java.util.Set;
 
 @Table(name = "users")
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -50,9 +52,12 @@ public class User implements UserDetails {
     private Date updatedAt;
 
     @JsonIgnore
-    @ToString.Exclude
     @ManyToMany(mappedBy = "members")
     private Set<Project> projects = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "admin")
+    private Set<Project> adminProjects = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

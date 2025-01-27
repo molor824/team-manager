@@ -2,15 +2,17 @@ package com.example.teammanager.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Table(name = "projects")
 @Entity
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +26,6 @@ public class Project {
     private String description;
 
     @JsonIgnore
-    @ToString.Exclude
     @ManyToMany
     @JoinTable(
             name = "project_member_rel", // Join table name
@@ -34,7 +35,6 @@ public class Project {
     private Set<User> members = new HashSet<>();
 
     @JsonIgnore
-    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "admin_id", nullable = false)
     private User admin;
