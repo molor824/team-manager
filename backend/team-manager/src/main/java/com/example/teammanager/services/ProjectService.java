@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
+@Transactional
 @Service
 public class ProjectService {
     private final ProjectRepository projectRepository;
@@ -23,7 +24,6 @@ public class ProjectService {
         this.userService = userService;
     }
 
-    @Transactional
     public Project createProject(ProjectDto projectDto) throws StatusException {
         var currentUser = userService.getCurrentUser();
 
@@ -65,18 +65,17 @@ public class ProjectService {
     }
 
     private void validateProjectAdmin(User member, Project project) throws StatusException {
-        if (project.getAdmin() != member) {
+        if (!project.getAdmin().getId().equals(member.getId())) {
             throw new UnauthorizedMemberException();
         }
     }
 
     private void validateProjectMember(User member, Project project) throws StatusException {
-        if (!project.getMembers().contains(member)) {
+        if (project.getMembers().stream().noneMatch(m -> m.getId().equals(member.getId()))) {
             throw new NotMemberException();
         }
     }
 
-    @Transactional
     public Project updateProject(Long id, ProjectDto projectDto) throws StatusException {
         var currentUser = userService.getCurrentUser();
         var project = getProjectById(id);
@@ -89,7 +88,6 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    @Transactional
     public void deleteProject(Long id) throws StatusException {
         var currentUser = userService.getCurrentUser();
         var project = getProjectById(id);
@@ -99,22 +97,18 @@ public class ProjectService {
 
     // New Methods for Managing User-Team Relationships
 
-    @Transactional
     public void addMemberToProject(Long projectId, Long memberId) throws StatusException {
-        var team = getProjectById(projectId);
+        var project = getProjectById(projectId);
         var user = userService.getUserById(memberId);
         var currentUser = userService.getCurrentUser();
 
-        validateProjectAdmin(currentUser, team);
+        validateProjectAdmin(currentUser, project);
 
-        team.getMembers().add(user);
-        user.getProjects().add(team);
+        project.getMembers().add(user);
 
-        userRepository.save(user);
-        projectRepository.save(team);
+        projectRepository.save(project);
     }
 
-    @Transactional
     public void removeUserFromProject(Long projectId, Long userId) throws StatusException {
         var project = getProjectById(projectId);
         var user = userService.getUserById(userId);
@@ -126,17 +120,14 @@ public class ProjectService {
             if (isAdmin) {
                 deleteProject(projectId);
             } else {
-                currentUser.getProjects().remove(project);
                 project.getMembers().remove(user);
             }
         } else if (isAdmin) {
-            user.getProjects().remove(project);
             project.getMembers().remove(user);
         } else {
             throw new UnauthorizedMemberException();
         }
 
-        userRepository.save(user);
         projectRepository.save(project);
     }
 
