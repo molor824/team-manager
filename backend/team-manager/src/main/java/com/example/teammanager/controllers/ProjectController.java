@@ -20,7 +20,8 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ProjectResponseDto createProject(@RequestBody ProjectDto projectDto) throws UserNotFoundException, ProjectExistException {
+    public ProjectResponseDto createProject(@RequestBody ProjectDto projectDto)
+            throws UserNotFoundException, ProjectExistException {
         return new ProjectResponseDto(projectService.createProject(projectDto));
     }
 
@@ -56,7 +57,10 @@ public class ProjectController {
     @GetMapping("/{projectId}/users")
     public List<UserDto> getMembersInProject(@PathVariable Long projectId) throws ProjectNotFoundException {
         var users = projectService.getMembersInProject(projectId); // This should return a Set<User> or List<User>
-        return users.stream().map(user -> new UserDto(user.getId(), user.getEmail(), user.getFullName())) // Adjust `getFullName()` if necessary
+        return users.stream().map(user -> new UserDto(user.getId(), user.getEmail(), user.getFullName())) // Adjust
+                                                                                                          // `getFullName()`
+                                                                                                          // if
+                                                                                                          // necessary
                 .toList();
     }
 }

@@ -6,8 +6,8 @@ import com.example.teammanager.entities.User;
 import com.example.teammanager.exception.*;
 import com.example.teammanager.repositories.ProjectRepository;
 import com.example.teammanager.repositories.UserRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -23,34 +23,35 @@ public class ProjectService {
         this.userService = userService;
     }
 
+    @Transactional
     public Project createProject(ProjectDto projectDto) throws UserNotFoundException, ProjectExistException {
         var currentUser = userService.getCurrentUser();
-        var project = new Project();
 
         if (projectRepository.findByName(projectDto.name()).isPresent()) {
             throw ProjectExistException.withName(projectDto.name());
         }
 
+        var project = new Project();
         project.setName(projectDto.name());
         project.setDescription(projectDto.description());
         project.setAdmin(currentUser);
-        project.setMembers(Set.of(currentUser));
+        project = projectRepository.save(project);
 
         currentUser.getProjects().add(project);
+        project.getMembers().add(currentUser);
 
-        userRepository.save(currentUser);
-        return projectRepository.save(project);
+        return project;
     }
 
-//    public Project getProjectByName(String name)
-//            throws ProjectNotFoundException, UserNotFoundException, NotMemberException {
-//        var currentUser = userService.getCurrentUser();
-//        var project = projectRepository.findByName(name)
-//                .orElseThrow(() -> ProjectNotFoundException.withName(name));
-//        validateProjectMember(currentUser, project);
-//
-//        return project;
-//    }
+    // public Project getProjectByName(String name)
+    // throws ProjectNotFoundException, UserNotFoundException, NotMemberException {
+    // var currentUser = userService.getCurrentUser();
+    // var project = projectRepository.findByName(name)
+    // .orElseThrow(() -> ProjectNotFoundException.withName(name));
+    // validateProjectMember(currentUser, project);
+    //
+    // return project;
+    // }
 
     public Project getProjectById(Long id)
             throws ProjectNotFoundException, UserNotFoundException, NotMemberException {
