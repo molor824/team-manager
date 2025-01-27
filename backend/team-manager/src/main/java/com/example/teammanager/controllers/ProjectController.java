@@ -7,6 +7,7 @@ import com.example.teammanager.services.ProjectService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/projects")
@@ -29,8 +30,8 @@ public class ProjectController {
     }
 
     @GetMapping
-    public List<ProjectResponseDto> getAllProjects() {
-        return projectService.getAllProjects().stream().map(ProjectResponseDto::new).collect(Collectors.toList());
+    public Set<ProjectResponseDto> getAllProjects() {
+        return projectService.getAllProjects().stream().map(ProjectResponseDto::new).collect(Collectors.toSet());
     }
 
     @PutMapping("/{id}")
@@ -48,13 +49,10 @@ public class ProjectController {
         projectService.removeUserFromProject(projectId, memberId);
     }
 
-    @GetMapping("/{projectId}/users")
+    @GetMapping("/{projectId}/members")
     public List<UserDto> getMembersInProject(@PathVariable Long projectId) {
         var users = projectService.getMembersInProject(projectId); // This should return a Set<User> or List<User>
-        return users.stream().map(user -> new UserDto(user.getId(), user.getEmail(), user.getFullName())) // Adjust
-                // `getFullName()`
-                // if
-                // necessary
-                .toList();
+        return users.stream()
+                .map(user -> new UserDto(user.getId(), user.getEmail(), user.getFullName())).toList();
     }
 }

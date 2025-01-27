@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
-@Transactional
 @Service
 public class ProjectService {
     private final ProjectRepository projectRepository;
@@ -21,6 +20,7 @@ public class ProjectService {
         this.userService = userService;
     }
 
+    @Transactional
     public Project createProject(ProjectDto projectDto) {
         var currentUser = userService.getCurrentUser();
 
@@ -46,6 +46,7 @@ public class ProjectService {
     // return project;
     // }
 
+    @Transactional(readOnly = true)
     public Project getProjectById(Long id) {
         var currentUser = userService.getCurrentUser();
         var project = projectRepository.findById(id)
@@ -55,6 +56,7 @@ public class ProjectService {
         return project;
     }
 
+    @Transactional(readOnly = true)
     public Set<Project> getAllProjects() {
         var currentUser = userService.getCurrentUser();
         return currentUser.getProjects();
@@ -72,6 +74,7 @@ public class ProjectService {
         }
     }
 
+    @Transactional
     public Project updateProject(Long id, ProjectDto projectDto) {
         var currentUser = userService.getCurrentUser();
         var project = getProjectById(id);
@@ -84,6 +87,7 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
+    @Transactional
     public void deleteProject(Long id) {
         var currentUser = userService.getCurrentUser();
         var project = getProjectById(id);
@@ -93,6 +97,7 @@ public class ProjectService {
 
     // New Methods for Managing User-Team Relationships
 
+    @Transactional
     public void addMemberToProject(Long projectId, Long memberId) {
         var project = getProjectById(projectId);
         var user = userService.getUserById(memberId);
@@ -105,19 +110,20 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
+    @Transactional
     public void removeUserFromProject(Long projectId, Long userId) {
         var project = getProjectById(projectId);
         var user = userService.getUserById(userId);
         var currentUser = userService.getCurrentUser();
 
-        var isAdmin = project.getAdmin() == currentUser;
+        var isAdmin = project.getAdmin().getId().equals(currentUser.getId());
 
-        if (user == currentUser) {
+        if (user.getId().equals(currentUser.getId())) {
             if (isAdmin) {
                 deleteProject(projectId);
-            } else {
-                project.getMembers().remove(user);
+                return;
             }
+            project.getMembers().remove(user);
         } else if (isAdmin) {
             project.getMembers().remove(user);
         } else {
@@ -127,8 +133,8 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
-    public Set<User> getMembersInProject(Long projectId)
-            throws StatusException {
+    @Transactional(readOnly = true)
+    public Set<User> getMembersInProject(Long projectId) {
         return projectRepository.findById(projectId)
                 .orElseThrow(() -> ProjectNotFoundException.withId(projectId)).getMembers();
     }

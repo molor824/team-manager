@@ -26,7 +26,7 @@ public class Project {
     private String description;
 
     @JsonIgnore
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "project_member_rel", // Join table name
             joinColumns = @JoinColumn(name = "project_id"), // Foreign key for Team
@@ -35,7 +35,7 @@ public class Project {
     private Set<User> members = new HashSet<>();
 
     @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "admin_id", nullable = false)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "admin_id")
     private User admin;
 }
