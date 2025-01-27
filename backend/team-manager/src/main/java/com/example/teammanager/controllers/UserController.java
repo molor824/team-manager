@@ -2,7 +2,6 @@ package com.example.teammanager.controllers;
 
 import com.example.teammanager.dtos.EditProfileDto;
 import com.example.teammanager.dtos.UserResponseDto;
-import com.example.teammanager.exception.UserNotFoundException;
 import com.example.teammanager.services.UserService;
 
 import org.springframework.http.HttpStatus;

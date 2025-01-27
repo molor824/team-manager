@@ -3,7 +3,6 @@ package com.example.teammanager.controllers;
 import com.example.teammanager.dtos.ProjectDto;
 import com.example.teammanager.dtos.ProjectResponseDto;
 import com.example.teammanager.dtos.UserDto;
-import com.example.teammanager.exception.StatusException;
 import com.example.teammanager.services.ProjectService;
 import org.springframework.web.bind.annotation.*;
 
