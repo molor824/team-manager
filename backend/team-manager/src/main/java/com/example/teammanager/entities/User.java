@@ -18,10 +18,12 @@ import java.util.Set;
 
 @Table(name = "users")
 @Entity
+@Data
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = { "projects", "adminProjects" })
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -36,6 +38,7 @@ public class User implements UserDetails {
     @NotBlank
     private String email;
 
+    @JsonIgnore
     @Column(name = "password", nullable = false, length = 400)
     @NotBlank
     private String password;
@@ -52,10 +55,12 @@ public class User implements UserDetails {
     private Date updatedAt;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "members")
-    private Set<Project> projects = new HashSet<>();
+    @ToString.Exclude
+    @OneToMany(mappedBy = "member")
+    private Set<ProjectMemberRelation> projects = new HashSet<>();
 
     @JsonIgnore
+    @ToString.Exclude
     @OneToMany(mappedBy = "admin")
     private Set<Project> adminProjects = new HashSet<>();
 
