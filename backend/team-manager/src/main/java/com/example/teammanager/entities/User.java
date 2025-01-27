@@ -38,7 +38,7 @@ public class User implements UserDetails {
     @NotBlank
     private String password;
 
-    @Column(name = "phone_number", nullable = false, length = 20)
+    @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
     @CreationTimestamp
@@ -51,8 +51,8 @@ public class User implements UserDetails {
 
     @JsonIgnore
     @ToString.Exclude
-    @ManyToMany(mappedBy = "users", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private Set<Team> teams = new HashSet<>();
+    @ManyToMany(mappedBy = "members")
+    private Set<Project> projects = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
