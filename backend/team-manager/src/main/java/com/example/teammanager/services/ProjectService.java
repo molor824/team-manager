@@ -24,7 +24,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public Project createProject(ProjectDto projectDto) throws UserNotFoundException, ProjectExistException {
+    public Project createProject(ProjectDto projectDto) throws StatusException {
         var currentUser = userService.getCurrentUser();
 
         if (projectRepository.findByName(projectDto.name()).isPresent()) {
@@ -35,12 +35,9 @@ public class ProjectService {
         project.setName(projectDto.name());
         project.setDescription(projectDto.description());
         project.setAdmin(currentUser);
-        project = projectRepository.save(project);
-
-        currentUser.getProjects().add(project);
         project.getMembers().add(currentUser);
 
-        return project;
+        return projectRepository.save(project);
     }
 
     // public Project getProjectByName(String name)
@@ -53,8 +50,7 @@ public class ProjectService {
     // return project;
     // }
 
-    public Project getProjectById(Long id)
-            throws ProjectNotFoundException, UserNotFoundException, NotMemberException {
+    public Project getProjectById(Long id) throws StatusException {
         var currentUser = userService.getCurrentUser();
         var project = projectRepository.findById(id)
                 .orElseThrow(() -> ProjectNotFoundException.withId(id));
@@ -63,26 +59,25 @@ public class ProjectService {
         return project;
     }
 
-    public Set<Project> getAllProjects() throws UserNotFoundException {
+    public Set<Project> getAllProjects() throws StatusException {
         var currentUser = userService.getCurrentUser();
         return currentUser.getProjects();
     }
 
-    private void validateProjectAdmin(User member, Project project) throws UnauthorizedMemberException {
+    private void validateProjectAdmin(User member, Project project) throws StatusException {
         if (project.getAdmin() != member) {
             throw new UnauthorizedMemberException();
         }
     }
 
-    private void validateProjectMember(User member, Project project) throws NotMemberException {
+    private void validateProjectMember(User member, Project project) throws StatusException {
         if (!project.getMembers().contains(member)) {
             throw new NotMemberException();
         }
     }
 
     @Transactional
-    public Project updateProject(Long id, ProjectDto projectDto)
-            throws UserNotFoundException, UnauthorizedMemberException, ProjectNotFoundException, NotMemberException {
+    public Project updateProject(Long id, ProjectDto projectDto) throws StatusException {
         var currentUser = userService.getCurrentUser();
         var project = getProjectById(id);
 
@@ -95,8 +90,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public void deleteProject(Long id)
-            throws ProjectNotFoundException, UserNotFoundException, UnauthorizedMemberException, NotMemberException {
+    public void deleteProject(Long id) throws StatusException {
         var currentUser = userService.getCurrentUser();
         var project = getProjectById(id);
         validateProjectAdmin(currentUser, project);
@@ -106,8 +100,7 @@ public class ProjectService {
     // New Methods for Managing User-Team Relationships
 
     @Transactional
-    public void addMemberToProject(Long projectId, Long memberId)
-            throws ProjectNotFoundException, UserNotFoundException, UnauthorizedMemberException, NotMemberException {
+    public void addMemberToProject(Long projectId, Long memberId) throws StatusException {
         var team = getProjectById(projectId);
         var user = userService.getUserById(memberId);
         var currentUser = userService.getCurrentUser();
@@ -122,8 +115,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public void removeUserFromProject(Long projectId, Long userId)
-            throws ProjectNotFoundException, UserNotFoundException, UnauthorizedMemberException, NotMemberException {
+    public void removeUserFromProject(Long projectId, Long userId) throws StatusException {
         var project = getProjectById(projectId);
         var user = userService.getUserById(userId);
         var currentUser = userService.getCurrentUser();
@@ -149,7 +141,7 @@ public class ProjectService {
     }
 
     public Set<User> getMembersInProject(Long projectId)
-            throws ProjectNotFoundException {
+            throws StatusException {
         return projectRepository.findById(projectId)
                 .orElseThrow(() -> ProjectNotFoundException.withId(projectId)).getMembers();
     }

@@ -9,7 +9,6 @@ import java.util.Set;
 
 @Table(name = "projects")
 @Entity
-@Data
 @Getter
 @Setter
 @AllArgsConstructor
@@ -27,7 +26,6 @@ public class Project {
     private String description;
 
     @JsonIgnore
-    @ToString.Exclude
     @ManyToMany
     @JoinTable(
             name = "project_member_rel", // Join table name
@@ -37,7 +35,6 @@ public class Project {
     private Set<User> members = new HashSet<>();
 
     @JsonIgnore
-    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "admin_id", nullable = false)
     private User admin;

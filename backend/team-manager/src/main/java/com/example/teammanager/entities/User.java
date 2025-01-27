@@ -18,7 +18,6 @@ import java.util.Set;
 
 @Table(name = "users")
 @Entity
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -57,7 +56,6 @@ public class User implements UserDetails {
     private Set<Project> projects = new HashSet<>();
 
     @JsonIgnore
-    @ToString.Exclude
     @OneToMany(mappedBy = "admin")
     private Set<Project> adminProjects = new HashSet<>();
 

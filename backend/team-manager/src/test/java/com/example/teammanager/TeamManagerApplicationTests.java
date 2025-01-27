@@ -47,7 +47,7 @@ class TeamManagerApplicationTests {
     }
 
     @Test
-    void testProjectCreation() throws UserNotFoundException, UserExistException, ProjectNotFoundException, UnauthorizedMemberException, NotMemberException, ProjectExistException {
+    void testProjectCreation() throws StatusException {
         // Add a user to the team
         var memberResponse = authenticationController.signup(new RegisterUserDto(
                 "user1@mail.com",
