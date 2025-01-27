@@ -1,12 +1,10 @@
 package com.example.teammanager;
 
 import com.example.teammanager.controllers.AuthenticationController;
-import com.example.teammanager.controllers.ProjectController;
 import com.example.teammanager.controllers.UserController;
 import com.example.teammanager.dtos.LoginUserDto;
 import com.example.teammanager.dtos.RegisterUserDto;
 import com.example.teammanager.dtos.ProjectDto;
-import com.example.teammanager.exception.*;
 import com.example.teammanager.services.ProjectService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,7 @@ class TeamManagerApplicationTests {
     private UserController userController;
 
     @Test
-    void testAuthentication() throws UserNotFoundException, UserExistException {
+    void testAuthentication() {
         // Test user registration
         assert authenticationController != null;
         var response = authenticationController.signup(new RegisterUserDto(
@@ -47,7 +45,7 @@ class TeamManagerApplicationTests {
     }
 
     @Test
-    void testProjectCreation() throws StatusException {
+    void testProjectCreation() {
         // Add a user to the team
         var memberResponse = authenticationController.signup(new RegisterUserDto(
                 "user1@mail.com",

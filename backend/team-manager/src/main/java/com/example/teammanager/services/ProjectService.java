@@ -5,7 +5,6 @@ import com.example.teammanager.entities.Project;
 import com.example.teammanager.entities.User;
 import com.example.teammanager.exception.*;
 import com.example.teammanager.repositories.ProjectRepository;
-import com.example.teammanager.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,16 +14,14 @@ import java.util.Set;
 @Service
 public class ProjectService {
     private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
     private final UserService userService;
 
-    public ProjectService(ProjectRepository projectRepository, UserRepository userRepository, UserService userService) {
+    public ProjectService(ProjectRepository projectRepository, UserService userService) {
         this.projectRepository = projectRepository;
-        this.userRepository = userRepository;
         this.userService = userService;
     }
 
-    public Project createProject(ProjectDto projectDto) throws StatusException {
+    public Project createProject(ProjectDto projectDto) {
         var currentUser = userService.getCurrentUser();
 
         if (projectRepository.findByName(projectDto.name()).isPresent()) {
@@ -40,8 +37,7 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    // public Project getProjectByName(String name)
-    // throws ProjectNotFoundException, UserNotFoundException, NotMemberException {
+    // public Project getProjectByName(String name) {
     // var currentUser = userService.getCurrentUser();
     // var project = projectRepository.findByName(name)
     // .orElseThrow(() -> ProjectNotFoundException.withName(name));
@@ -50,7 +46,7 @@ public class ProjectService {
     // return project;
     // }
 
-    public Project getProjectById(Long id) throws StatusException {
+    public Project getProjectById(Long id) {
         var currentUser = userService.getCurrentUser();
         var project = projectRepository.findById(id)
                 .orElseThrow(() -> ProjectNotFoundException.withId(id));
@@ -59,24 +55,24 @@ public class ProjectService {
         return project;
     }
 
-    public Set<Project> getAllProjects() throws StatusException {
+    public Set<Project> getAllProjects() {
         var currentUser = userService.getCurrentUser();
         return currentUser.getProjects();
     }
 
-    private void validateProjectAdmin(User member, Project project) throws StatusException {
+    private void validateProjectAdmin(User member, Project project) {
         if (!project.getAdmin().getId().equals(member.getId())) {
             throw new UnauthorizedMemberException();
         }
     }
 
-    private void validateProjectMember(User member, Project project) throws StatusException {
+    private void validateProjectMember(User member, Project project) {
         if (project.getMembers().stream().noneMatch(m -> m.getId().equals(member.getId()))) {
             throw new NotMemberException();
         }
     }
 
-    public Project updateProject(Long id, ProjectDto projectDto) throws StatusException {
+    public Project updateProject(Long id, ProjectDto projectDto) {
         var currentUser = userService.getCurrentUser();
         var project = getProjectById(id);
 
@@ -88,7 +84,7 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    public void deleteProject(Long id) throws StatusException {
+    public void deleteProject(Long id) {
         var currentUser = userService.getCurrentUser();
         var project = getProjectById(id);
         validateProjectAdmin(currentUser, project);
@@ -97,7 +93,7 @@ public class ProjectService {
 
     // New Methods for Managing User-Team Relationships
 
-    public void addMemberToProject(Long projectId, Long memberId) throws StatusException {
+    public void addMemberToProject(Long projectId, Long memberId) {
         var project = getProjectById(projectId);
         var user = userService.getUserById(memberId);
         var currentUser = userService.getCurrentUser();
@@ -109,7 +105,7 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
-    public void removeUserFromProject(Long projectId, Long userId) throws StatusException {
+    public void removeUserFromProject(Long projectId, Long userId) {
         var project = getProjectById(projectId);
         var user = userService.getUserById(userId);
         var currentUser = userService.getCurrentUser();
