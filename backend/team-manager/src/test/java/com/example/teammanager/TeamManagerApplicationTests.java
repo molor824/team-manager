@@ -69,7 +69,6 @@ class TeamManagerApplicationTests {
         projectService.addMemberToProject(projectResponse.getId(), memberResponse.id());
 
         var membersResponse = projectService.getMembersInProject(projectResponse.getId());
-        assert membersResponse != null;
         assert membersResponse.size() == 2;
     }
 }

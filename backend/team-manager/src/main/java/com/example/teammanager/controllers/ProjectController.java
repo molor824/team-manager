@@ -1,14 +1,12 @@
 package com.example.teammanager.controllers;
 
 import com.example.teammanager.dtos.ProjectDto;
-import com.example.teammanager.dtos.ProjectResponseDto;
-import com.example.teammanager.dtos.UserDto;
+import com.example.teammanager.entities.Project;
+import com.example.teammanager.entities.User;
 import com.example.teammanager.services.ProjectService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RequestMapping("/api/projects")
 @RestController
@@ -20,23 +18,23 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ProjectResponseDto createProject(@RequestBody ProjectDto projectDto) {
-        return new ProjectResponseDto(projectService.createProject(projectDto));
+    public Project createProject(@RequestBody ProjectDto projectDto) {
+        return projectService.createProject(projectDto);
     }
 
     @GetMapping("/{id}")
-    public ProjectResponseDto getProjectById(@PathVariable Long id) {
-        return new ProjectResponseDto(projectService.getProjectById(id));
+    public Project getProjectById(@PathVariable Long id) {
+        return projectService.getMemberProjectById(id);
     }
 
     @GetMapping
-    public Set<ProjectResponseDto> getAllProjects() {
-        return projectService.getAllProjects().stream().map(ProjectResponseDto::new).collect(Collectors.toSet());
+    public List<Project> getAllProjects() {
+        return projectService.getAllProjects();
     }
 
     @PutMapping("/{id}")
-    public ProjectResponseDto updateProject(@PathVariable Long id, @RequestBody ProjectDto projectDto) {
-        return new ProjectResponseDto(projectService.updateProject(id, projectDto));
+    public Project updateProject(@PathVariable Long id, @RequestBody ProjectDto projectDto) {
+        return projectService.updateProject(id, projectDto);
     }
 
     @DeleteMapping("/{id}")
@@ -46,13 +44,11 @@ public class ProjectController {
 
     @DeleteMapping("/{projectId}/member/{memberId}")
     public void leaveProject(@PathVariable Long projectId, @PathVariable Long memberId) {
-        projectService.removeUserFromProject(projectId, memberId);
+        projectService.leaveFromProject(projectId, memberId);
     }
 
     @GetMapping("/{projectId}/members")
-    public List<UserDto> getMembersInProject(@PathVariable Long projectId) {
-        var users = projectService.getMembersInProject(projectId); // This should return a Set<User> or List<User>
-        return users.stream()
-                .map(user -> new UserDto(user.getId(), user.getEmail(), user.getFullName())).toList();
+    public List<User> getMembersInProject(@PathVariable Long projectId) {
+        return projectService.getMembersInProject(projectId);
     }
 }

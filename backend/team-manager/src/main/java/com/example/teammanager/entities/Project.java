@@ -13,6 +13,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = { "members", "admin" })
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,16 +27,13 @@ public class Project {
     private String description;
 
     @JsonIgnore
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(
-            name = "project_member_rel", // Join table name
-            joinColumns = @JoinColumn(name = "project_id"), // Foreign key for Team
-            inverseJoinColumns = @JoinColumn(name = "member_id") // Foreign key for User
-    )
-    private Set<User> members = new HashSet<>();
+    @ToString.Exclude
+    @OneToMany(mappedBy = "project")
+    private Set<ProjectMemberRelation> members = new HashSet<>();
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "admin_id")
     private User admin;
 }
