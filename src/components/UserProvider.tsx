@@ -7,9 +7,9 @@ export type User = {
   phoneNumber?: string;
 };
 export type UserInfo = {
-  user?: User;
-  token: string;
-  setToken: (token: string) => void;
+  user: User | null;
+  token: string | null;
+  setToken: (token: string | null) => void;
 };
 
 const UserContext = createContext<UserInfo>({} as any);
@@ -17,18 +17,19 @@ const UserContext = createContext<UserInfo>({} as any);
 export function useUser() {
   return useContext(UserContext);
 }
+
 export function UserProvider({ children }: React.PropsWithChildren) {
-  const [user, setUser] = useState<User>();
-  const [userToken, _setUserToken] = useState<string>(
-    () => localStorage.getItem("token") || ""
+  const [user, setUser] = useState<User | null>(null);
+  const [userToken, _setUserToken] = useState<string | null>(() =>
+    localStorage.getItem("token")
   );
-  const setUserToken = (token: string) => {
+  const setUserToken = (token: string | null) => {
     if (token === userToken) return;
 
-    if (token === "") localStorage.removeItem("token");
+    if (!token) localStorage.removeItem("token");
     else localStorage.setItem("token", token);
     _setUserToken(token);
-    setUser(undefined);
+    setUser(null);
   };
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export function UserProvider({ children }: React.PropsWithChildren) {
       })
       .catch((err) => {
         console.error(err);
-        setUserToken("");
+        setUserToken(null);
       });
   }, [userToken]);
 

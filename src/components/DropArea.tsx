@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 
 interface DropAreaProps {
   onDrop: () => void;
 }
 
-const DropArea: React.FC<DropAreaProps> = ({ onDrop }) => {
+const DropArea: React.FC<DropAreaProps> = ({onDrop}) => {
   const [showDrop, setShowDrop] = useState(false);
 
   return (
@@ -24,7 +24,7 @@ const DropArea: React.FC<DropAreaProps> = ({ onDrop }) => {
       {showDrop && <p className="text-gray-500">Drop Here</p>}
     </div>
   );
-  
+
 };
 
 export default DropArea;

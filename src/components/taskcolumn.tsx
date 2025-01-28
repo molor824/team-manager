@@ -44,7 +44,7 @@ export default function TaskColumn({
       onDragOver={(e) => e.preventDefault()}
     >
       <div className="flex items-center">
-        <div className="w-8 h-8">{icon}</div> {/* Render icon here */}
+        <div className="w-8 h-8">{icon}</div>
         <Title level={4}>{title}</Title>
       </div>
 
