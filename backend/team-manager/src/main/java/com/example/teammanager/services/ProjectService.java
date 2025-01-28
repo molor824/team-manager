@@ -2,90 +2,77 @@ package com.example.teammanager.services;
 
 import com.example.teammanager.dtos.ProjectDto;
 import com.example.teammanager.entities.Project;
+import com.example.teammanager.entities.ProjectMemberRelation;
 import com.example.teammanager.entities.User;
-import com.example.teammanager.exception.*;
+import com.example.teammanager.exception.ProjectExistException;
+import com.example.teammanager.exception.ProjectNotFoundException;
+import com.example.teammanager.exception.UnauthorizedMemberException;
 import com.example.teammanager.repositories.ProjectRepository;
-import com.example.teammanager.repositories.UserRepository;
-import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
+@AllArgsConstructor
 @Service
+@Transactional
 public class ProjectService {
     private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
     private final UserService userService;
+    private final ProjectMemberService projectMemberService;
 
-    public ProjectService(ProjectRepository projectRepository, UserRepository userRepository, UserService userService) {
-        this.projectRepository = projectRepository;
-        this.userRepository = userRepository;
-        this.userService = userService;
-    }
-
-    public Project createProject(ProjectDto projectDto) throws UserNotFoundException, ProjectExistException {
-        var currentUser = userService.getCurrentUser();
-        var project = new Project();
-
-        if (projectRepository.findByName(projectDto.name()).isPresent()) {
+    public Project createProject(ProjectDto projectDto) {
+        if (projectRepository.existsByName(projectDto.name())) {
             throw ProjectExistException.withName(projectDto.name());
         }
 
+        var currentUser = userService.getCurrentUser();
+
+        var project = new Project();
         project.setName(projectDto.name());
         project.setDescription(projectDto.description());
         project.setAdmin(currentUser);
-        project.setMembers(Set.of(currentUser));
+        project = projectRepository.save(project);
 
-        currentUser.getProjects().add(project);
-
-        userRepository.save(currentUser);
-        return projectRepository.save(project);
-    }
-
-//    public Project getProjectByName(String name)
-//            throws ProjectNotFoundException, UserNotFoundException, NotMemberException {
-//        var currentUser = userService.getCurrentUser();
-//        var project = projectRepository.findByName(name)
-//                .orElseThrow(() -> ProjectNotFoundException.withName(name));
-//        validateProjectMember(currentUser, project);
-//
-//        return project;
-//    }
-
-    public Project getProjectById(Long id)
-            throws ProjectNotFoundException, UserNotFoundException, NotMemberException {
-        var currentUser = userService.getCurrentUser();
-        var project = projectRepository.findById(id)
-                .orElseThrow(() -> ProjectNotFoundException.withId(id));
-        validateProjectMember(currentUser, project);
+        projectMemberService.addRelation(project, currentUser);
 
         return project;
     }
 
-    public Set<Project> getAllProjects() throws UserNotFoundException {
+    public List<Project> getAllProjects() {
         var currentUser = userService.getCurrentUser();
-        return currentUser.getProjects();
+        return projectMemberService.getAllRelationsByMember(currentUser).stream().map(
+                ProjectMemberRelation::getProject
+        ).toList();
     }
 
-    private void validateProjectAdmin(User member, Project project) throws UnauthorizedMemberException {
-        if (project.getAdmin() != member) {
+    public Project getMemberProjectById(Long id) {
+        var currentUser = userService.getCurrentUser();
+        var project = projectRepository.findById(id).orElseThrow(() ->
+                ProjectNotFoundException.withId(id)
+        );
+        if (!projectMemberService.memberExist(project, currentUser)) {
+            throw ProjectNotFoundException.withId(id);
+        }
+        return project;
+    }
+
+    private Project getAdminProjectById(Long id) {
+        var currentUser = userService.getCurrentUser();
+        var project = projectRepository.findById(id).orElseThrow(() ->
+                ProjectNotFoundException.withId(id)
+        );
+        if (!project.getAdmin().equals(currentUser)) {
             throw new UnauthorizedMemberException();
         }
+        return project;
     }
 
-    private void validateProjectMember(User member, Project project) throws NotMemberException {
-        if (!project.getMembers().contains(member)) {
-            throw new NotMemberException();
-        }
-    }
-
-    @Transactional
-    public Project updateProject(Long id, ProjectDto projectDto)
-            throws UserNotFoundException, UnauthorizedMemberException, ProjectNotFoundException, NotMemberException {
-        var currentUser = userService.getCurrentUser();
-        var project = getProjectById(id);
-
-        validateProjectAdmin(currentUser, project);
+    public Project updateProject(Long id, ProjectDto projectDto) {
+        var project = getAdminProjectById(id);
 
         project.setName(projectDto.name());
         project.setDescription(projectDto.description());
@@ -93,63 +80,42 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    @Transactional
-    public void deleteProject(Long id)
-            throws ProjectNotFoundException, UserNotFoundException, UnauthorizedMemberException, NotMemberException {
-        var currentUser = userService.getCurrentUser();
-        var project = getProjectById(id);
-        validateProjectAdmin(currentUser, project);
+    public void deleteProject(Long id) {
+        var project = getAdminProjectById(id);
+
+        projectMemberService.deleteProject(project);
         projectRepository.deleteById(id);
     }
 
     // New Methods for Managing User-Team Relationships
 
-    @Transactional
-    public void addMemberToProject(Long projectId, Long memberId)
-            throws ProjectNotFoundException, UserNotFoundException, UnauthorizedMemberException, NotMemberException {
-        var team = getProjectById(projectId);
-        var user = userService.getUserById(memberId);
-        var currentUser = userService.getCurrentUser();
+    public void addMemberToProject(Long projectId, Long memberId) {
+        var project = getAdminProjectById(projectId);
+        var member = userService.getUserById(memberId);
 
-        validateProjectAdmin(currentUser, team);
-
-        team.getMembers().add(user);
-        user.getProjects().add(team);
-
-        userRepository.save(user);
-        projectRepository.save(team);
+        projectMemberService.addRelation(project, member);
     }
 
-    @Transactional
-    public void removeUserFromProject(Long projectId, Long userId)
-            throws ProjectNotFoundException, UserNotFoundException, UnauthorizedMemberException, NotMemberException {
-        var project = getProjectById(projectId);
-        var user = userService.getUserById(userId);
+    public void leaveFromProject(Long projectId, Long userId) {
         var currentUser = userService.getCurrentUser();
+        var project = getMemberProjectById(projectId);
+        var user = userService.getUserById(userId);
 
-        var isAdmin = project.getAdmin() == currentUser;
+        var isAdmin = project.getAdmin().getId().equals(currentUser.getId());
+        var isItself = userId.equals(currentUser.getId());
 
-        if (user == currentUser) {
-            if (isAdmin) {
-                deleteProject(projectId);
-            } else {
-                currentUser.getProjects().remove(project);
-                project.getMembers().remove(user);
-            }
-        } else if (isAdmin) {
-            user.getProjects().remove(project);
-            project.getMembers().remove(user);
+        if (isAdmin && isItself) {
+            projectMemberService.deleteProject(project);
+        } else if (isAdmin || isItself) {
+            projectMemberService.deleteRelation(project, user);
         } else {
             throw new UnauthorizedMemberException();
         }
-
-        userRepository.save(user);
-        projectRepository.save(project);
     }
 
-    public Set<User> getMembersInProject(Long projectId)
-            throws ProjectNotFoundException {
-        return projectRepository.findById(projectId)
-                .orElseThrow(() -> ProjectNotFoundException.withId(projectId)).getMembers();
+    public List<User> getMembersInProject(Long projectId) {
+        var project = getMemberProjectById(projectId);
+        var members = project.getMembers();
+        return members.stream().map(ProjectMemberRelation::getMember).toList();
     }
 }

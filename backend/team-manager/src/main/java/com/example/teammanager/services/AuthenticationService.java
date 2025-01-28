@@ -26,7 +26,7 @@ public class AuthenticationService {
         this.authenticationManager = manager;
     }
 
-    public void signup(RegisterUserDto dto) throws UserExistException {
+    public void signup(RegisterUserDto dto) {
         if (userRepository.findByEmail(dto.email()).isPresent()) {
             throw new UserExistException("User already exists");
         }
@@ -44,7 +44,7 @@ public class AuthenticationService {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    public User authenticate(LoginUserDto dto) throws UserNotFoundException {
+    public User authenticate(LoginUserDto dto) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 dto.email(),
                 dto.password()));

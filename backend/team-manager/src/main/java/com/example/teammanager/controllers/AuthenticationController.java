@@ -3,8 +3,6 @@ package com.example.teammanager.controllers;
 import com.example.teammanager.dtos.LoginResponseDto;
 import com.example.teammanager.dtos.LoginUserDto;
 import com.example.teammanager.dtos.RegisterUserDto;
-import com.example.teammanager.exception.UserExistException;
-import com.example.teammanager.exception.UserNotFoundException;
 import com.example.teammanager.services.AuthenticationService;
 import com.example.teammanager.services.JwtService;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +19,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public LoginResponseDto signup(@RequestBody RegisterUserDto dto) throws UserExistException, UserNotFoundException {
+    public LoginResponseDto signup(@RequestBody RegisterUserDto dto) {
         authenticationService.signup(dto);
         return login(new LoginUserDto(dto.email(), dto.password()));
     }
@@ -32,7 +30,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public LoginResponseDto login(@RequestBody LoginUserDto dto) throws UserNotFoundException {
+    public LoginResponseDto login(@RequestBody LoginUserDto dto) {
         var authenticatedUser = authenticationService.authenticate(dto);
         var jwtToken = jwtService.generateToken(authenticatedUser);
         return new LoginResponseDto(authenticatedUser.getId(), jwtToken);
