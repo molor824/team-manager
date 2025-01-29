@@ -8,22 +8,18 @@ import com.example.teammanager.exception.UserNotFoundException;
 import com.example.teammanager.repositories.ProjectRepository;
 import com.example.teammanager.repositories.UserRepository;
 import com.example.teammanager.repositories.WorkRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @Service
 public class WorkService {
     private final WorkRepository workRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
-
-    public WorkService(WorkRepository workRepository, ProjectRepository projectRepository, UserRepository userRepository) {
-        this.workRepository = workRepository;
-        this.projectRepository = projectRepository;
-        this.userRepository = userRepository;
-    }
 
     public List<WorkDto> getWorkByProjectId(Long projectId) {
         return workRepository.findByProjectId(projectId).stream().map(this::toDto).collect(Collectors.toList());
@@ -52,18 +48,15 @@ public class WorkService {
         workRepository.delete(work);
     }
 
-
-
-
-
     private WorkDto toDto(Work work) {
+        var user = work.getAssignedUser();
         return new WorkDto(
                 work.getId(),
                 work.getTitle(),
                 work.getDescription(),
                 work.getStatus(),
                 work.getProject().getId(),
-                work.getAssignedUser() != null ? work.getAssignedUser().getId() : null
+                user != null ? user.getId() : null
         );
     }
 }

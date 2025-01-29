@@ -2,7 +2,6 @@ package com.example.teammanager.controllers;
 
 import com.example.teammanager.dtos.WorkDto;
 import com.example.teammanager.services.WorkService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,23 +16,22 @@ public class WorkController {
     }
 
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<WorkDto>> getWorkByProjectId(@PathVariable Long projectId) {
-        return ResponseEntity.ok(workService.getWorkByProjectId(projectId));
+    public List<WorkDto> getWorkByProjectId(@PathVariable Long projectId) {
+        return workService.getWorkByProjectId(projectId);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<WorkDto>> getWorkByAssignedUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(workService.getWorkByAssignedUserId(userId));
+    public List<WorkDto> getWorkByAssignedUserId(@PathVariable Long userId) {
+        return workService.getWorkByAssignedUserId(userId);
     }
 
     @PostMapping
-    public ResponseEntity<WorkDto> createWork(@RequestBody WorkDto dto) {
-        return ResponseEntity.ok(workService.createWork(dto));
+    public WorkDto createWork(@RequestBody WorkDto dto) {
+        return workService.createWork(dto);
     }
 
     @DeleteMapping("/project/{projectId}/{taskId}")
-    public ResponseEntity<Void> deleteWork(@PathVariable Long projectId, @PathVariable Long taskId) {
+    public void deleteWork(@PathVariable Long projectId, @PathVariable Long taskId) {
         workService.deleteWorkByProjectAndId(projectId, taskId);
-        return ResponseEntity.noContent().build();
     }
 }
