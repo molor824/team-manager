@@ -1,9 +1,12 @@
 package com.example.teammanager.controllers;
 
 import com.example.teammanager.dtos.ProjectDto;
+import com.example.teammanager.dtos.ProjectResponseDto;
 import com.example.teammanager.entities.Project;
+import com.example.teammanager.entities.ProjectMemberRelation;
 import com.example.teammanager.entities.User;
 import com.example.teammanager.services.ProjectService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,8 +26,16 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}")
-    public Project getProjectById(@PathVariable Long id) {
-        return projectService.getMemberProjectById(id);
+    @Transactional
+    public ProjectResponseDto getProjectById(@PathVariable Long id) {
+        var project = projectService.getMemberProjectById(id);
+        return new ProjectResponseDto(
+                project.getId(),
+                project.getName(),
+                project.getDescription(),
+                project.getMembers().stream().map(ProjectMemberRelation::getMember).toList(),
+                project.getAdmin().getId()
+        );
     }
 
     @GetMapping
@@ -45,10 +56,5 @@ public class ProjectController {
     @DeleteMapping("/{projectId}/member/{memberId}")
     public void leaveProject(@PathVariable Long projectId, @PathVariable Long memberId) {
         projectService.leaveFromProject(projectId, memberId);
-    }
-
-    @GetMapping("/{projectId}/members")
-    public List<User> getMembersInProject(@PathVariable Long projectId) {
-        return projectService.getMembersInProject(projectId);
     }
 }

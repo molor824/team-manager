@@ -41,7 +41,7 @@ class TeamManagerApplicationTests {
         // Test authorization
         var response2 = userController.authenticatedUser();
         assert response2 != null;
-        assert response2.email().equals("test@mail.com");
+        assert response2.getEmail().equals("test@mail.com");
     }
 
     @Test

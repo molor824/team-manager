@@ -1,26 +1,25 @@
 import { Button, Card, List } from "antd";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getApi } from "../tools/fetchApi";
 import { useUser } from "../components/UserProvider";
-import { useParams } from "react-router-dom";
 import NewProjectDrawer from "../components/NewProjectDrawer";
+import { useRequest } from "ahooks";
+import { Link } from "react-router-dom";
 
 type Project = {
+  id: number;
   name: string;
   description: string;
 };
 export default function ProjectsPage() {
-  const { projectId } = useParams();
-  const [projects, setProjects] = useState<Project[]>([]);
   const { token } = useUser();
   const [openNewProject, setOpenNewProject] = useState(false);
-
-  useEffect(() => {
-    getApi("/projects", token).then((ps) => {
-      console.log(ps);
-      setProjects(ps);
-    });
-  }, []);
+  const { data: projects, run } = useRequest(
+    () => getApi("/projects", token) as Promise<Project[]>,
+    {
+      refreshDeps: [token],
+    }
+  );
 
   return (
     <Card>
@@ -36,22 +35,32 @@ export default function ProjectsPage() {
           </Button>
           <NewProjectDrawer
             open={openNewProject}
-            onClose={() => setOpenNewProject(false)}
+            onClose={() => {
+              setOpenNewProject(false);
+              run();
+            }}
           />
         </div>
-        {projects.length ? (
+        {projects?.length ? (
           <List itemLayout="vertical" bordered>
             {projects.map((project) => (
               <List.Item>
                 <div className="flex items-center justify-between gap-16">
                   <span className="text-lg">{project.name}</span>
-                  <span>{project.description}</span>
+                  <div className="flex gap-8 items-center">
+                    <span className="max-w-[200px] overflow-ellipsis">
+                      {project.description}
+                    </span>
+                    <Link to={`/projects/${project.id}`}>View</Link>
+                  </div>
                 </div>
               </List.Item>
             ))}
           </List>
         ) : (
-          <span className="text-center text-lg text-gray-500">No projects</span>
+          <span className="text-center text-lg text-gray-500">
+            {projects ? "No projects" : "Loading..."}
+          </span>
         )}
       </div>
     </Card>

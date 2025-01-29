@@ -1,7 +1,7 @@
 package com.example.teammanager.controllers;
 
 import com.example.teammanager.dtos.EditProfileDto;
-import com.example.teammanager.dtos.UserResponseDto;
+import com.example.teammanager.entities.User;
 import com.example.teammanager.services.UserService;
 
 import org.springframework.http.HttpStatus;
@@ -22,14 +22,8 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public UserResponseDto authenticatedUser() {
-        var user = userService.getCurrentUser();
-        return new UserResponseDto(
-                user.getFullName(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getCreatedAt().getTime(),
-                user.getUpdatedAt().getTime());
+    public User authenticatedUser() {
+        return userService.getCurrentUser();
     }
 
     @PutMapping("/edit")
