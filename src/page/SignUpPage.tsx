@@ -1,29 +1,22 @@
 import { Button, Card, Form, Input } from "antd";
-import { useState } from "react";
 import { useUser } from "../components/UserProvider";
 import { Link, useNavigate } from "react-router-dom";
 import { postApi } from "../tools/fetchApi";
+import { useRequest } from "ahooks";
 
 export default function SignUpPage() {
-  const [loading, setLoading] = useState(false);
-  const [accountExists, setAccountExists] = useState(false);
   const { setToken } = useUser();
-  const [form] = Form.useForm();
   const navigate = useNavigate();
-  const handleOnFinish = (data: any) => {
-    setLoading(true);
-    setAccountExists(false);
-    postApi("/auth/signup", data)
-      .then((res) => {
-        setToken(res.token);
-        navigate("/");
-      })
-      .catch((_) => {
-        setLoading(false);
-        setAccountExists(true);
-        form.resetFields();
-      });
-  };
+  const { loading, run, error } = useRequest(
+    (data: any) =>
+      postApi("/auth/signup", data)
+        .then((res) => {
+          setToken(res.token);
+          navigate("/");
+        })
+        .catch(() => Promise.reject(new Error("Account already exists!"))),
+    { manual: true }
+  );
 
   return (
     <Card className="max-w-[400px] mx-auto">
@@ -34,15 +27,12 @@ export default function SignUpPage() {
           Log In
         </Link>
       </div>
-      <p className="text-red-500" hidden={!accountExists}>
-        The account already exists!
-      </p>
+      {error && <p className="text-red-500">{error.message}</p>}
       <Form
         className="mt-8"
         layout="vertical"
-        onFinish={handleOnFinish}
+        onFinish={run}
         disabled={loading}
-        form={form}
       >
         <Form.Item
           label="E-Mail"

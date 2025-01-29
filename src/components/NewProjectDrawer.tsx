@@ -1,8 +1,8 @@
 import { Button, Drawer, Form, Input } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import { useState } from "react";
 import { postApi } from "../tools/fetchApi";
 import { useUser } from "./UserProvider";
+import { useRequest } from "ahooks";
 
 type Props = {
   open: boolean;
@@ -14,29 +14,23 @@ type Form = {
 };
 
 export default function NewProjectDrawer({ open, onClose }: Props) {
-  const [loading, setLoading] = useState(false);
-  const [failMessage, setFailMessage] = useState("");
   const { token } = useUser();
-
-  const handleForm = (value: Form) => {
-    setLoading(true);
-    setFailMessage("");
-
-    postApi("/projects", value, token)
-      .then((res) => console.log(res))
-      .catch((res) => {
-        if (res.status === 409) {
-          setFailMessage(`Team with name ${value.name} already exists.`);
-          setLoading(false);
-        }
-      })
-      .finally(() => onClose && onClose());
-  };
+  const { run, loading, error } = useRequest(
+    (value: Form) =>
+      postApi("/projects", value, token)
+        .then(() => onClose && onClose())
+        .catch(() =>
+          Promise.reject(
+            new Error(`Project with name ${value.name} already exists`)
+          )
+        ),
+    { manual: true }
+  );
 
   return (
     <Drawer open={open} onClose={onClose} title="Create new project">
-      <Form layout="vertical" disabled={loading} onFinish={handleForm}>
-        {failMessage && <p className="text-red-500">{failMessage}</p>}
+      <Form layout="vertical" disabled={loading} onFinish={run}>
+        {error && <p className="text-red-500">{error.message}</p>}
         <Form.Item
           name="name"
           label="Project Name"
