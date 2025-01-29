@@ -51,4 +51,5 @@ public class ProjectController {
     public List<User> getMembersInProject(@PathVariable Long projectId) {
         return projectService.getMembersInProject(projectId);
     }
+
 }
