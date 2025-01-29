@@ -16,7 +16,7 @@ public class Work {
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
 
-    @Column(name = "title", nullable = false, length = 255)
+    @Column(name = "title", nullable = false, length = 500)
     private String title;
 
     @Column(name = "description", length = 1000)
