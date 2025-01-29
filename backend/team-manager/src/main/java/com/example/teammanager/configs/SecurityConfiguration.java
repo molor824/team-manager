@@ -37,9 +37,7 @@ public class SecurityConfiguration {
             request.requestMatchers("/api/auth/**").permitAll();
             request.anyRequest().authenticated();
         });
-        http.sessionManagement(customizer -> {
-            customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        });
+        http.sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authenticationProvider(authenticationProvider);
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
