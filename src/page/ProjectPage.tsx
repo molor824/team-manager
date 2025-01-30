@@ -4,6 +4,7 @@ import { getApi } from "../tools/fetchApi";
 import { useUser } from "../components/UserProvider";
 import { useRequest } from "ahooks";
 import {
+  EditFilled,
   UserAddOutlined,
   UserDeleteOutlined,
   UsergroupDeleteOutlined,
@@ -38,9 +39,12 @@ export default function ProjectPage() {
     <Card>
       {project ? (
         <div className="flex flex-wrap gap-8">
-          <div className="flex flex-col gap-4 min-w-[300px]">
-            <div className="flex gap-4 justify-between">
+          <div className="flex gap-4 min-w-[300px] justify-between">
+            <div className="flex flex-col gap-2">
               <h1 className="font-bold text-lg">{project.name}</h1>
+              <p>{project.description}</p>
+            </div>
+            <div className="flex flex-col gap-2 items-end">
               <Button
                 danger
                 type="text"
@@ -54,8 +58,12 @@ export default function ProjectPage() {
               >
                 {isProjectAdmin ? "Delete" : "Leave"}
               </Button>
+              {isProjectAdmin && (
+                <Button type="text" icon={<EditFilled />}>
+                  Edit
+                </Button>
+              )}
             </div>
-            <p>{project.description}</p>
           </div>
           <List
             itemLayout="vertical"
