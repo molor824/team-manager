@@ -95,7 +95,7 @@ public class ProjectService {
         var isItself = userId.equals(currentUser.getId());
 
         if (isAdmin && isItself) {
-            projectMemberService.deleteProject(project);
+            deleteProject(projectId);
         } else if (isAdmin || isItself) {
             projectMemberService.deleteRelation(project, user);
         } else {

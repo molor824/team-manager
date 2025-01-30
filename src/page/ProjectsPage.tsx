@@ -43,8 +43,8 @@ export default function ProjectsPage() {
         </div>
         {projects?.length ? (
           <List itemLayout="vertical" bordered>
-            {projects.map((project) => (
-              <List.Item>
+            {projects.map((project, index) => (
+              <List.Item key={index}>
                 <div className="flex items-center justify-between gap-16">
                   <span className="text-lg">{project.name}</span>
                   <div className="flex gap-8 items-center">

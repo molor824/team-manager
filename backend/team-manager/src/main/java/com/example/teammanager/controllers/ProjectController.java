@@ -38,6 +38,11 @@ public class ProjectController {
         );
     }
 
+    @PutMapping("/{projectId}/member/{memberId}")
+    public void addMember(@PathVariable Long projectId, @PathVariable Long memberId) {
+        projectService.addMemberToProject(projectId, memberId);
+    }
+
     @GetMapping
     public List<Project> getAllProjects() {
         return projectService.getAllProjects();
