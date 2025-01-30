@@ -36,3 +36,7 @@ export async function postApi(url: string, body: any, token?: string | null) {
 export async function putApi(url: string, body: any, token?: string | null) {
   return fetchApi(url, "PUT", body, token);
 }
+
+export async function deleteApi(url: string, token?: string | null) {
+  return fetchApi(url, "DELETE", undefined, token);
+}

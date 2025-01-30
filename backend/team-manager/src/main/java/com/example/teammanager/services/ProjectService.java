@@ -63,21 +63,13 @@ public class ProjectService {
         var project = projectRepository.findById(id).orElseThrow(() ->
                 ProjectNotFoundException.withId(id)
         );
-        if (!project.getAdmin().equals(currentUser)) {
+        if (!project.getAdmin().getId().equals(currentUser.getId())) {
             throw new UnauthorizedMemberException();
         }
         return project;
     }
 
-    public Project updateProject(Long id, ProjectDto projectDto) {
-        var project = getAdminProjectById(id);
-
-        project.setName(projectDto.name());
-        project.setDescription(projectDto.description());
-
-        return projectRepository.save(project);
-    }
-
+    @Transactional
     public void deleteProject(Long id) {
         var project = getAdminProjectById(id);
 

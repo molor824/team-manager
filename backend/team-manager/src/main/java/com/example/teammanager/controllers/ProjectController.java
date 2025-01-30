@@ -43,11 +43,6 @@ public class ProjectController {
         return projectService.getAllProjects();
     }
 
-    @PutMapping("/{id}")
-    public Project updateProject(@PathVariable Long id, @RequestBody ProjectDto projectDto) {
-        return projectService.updateProject(id, projectDto);
-    }
-
     @DeleteMapping("/{id}")
     public void deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
