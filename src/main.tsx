@@ -12,8 +12,11 @@ import LogInPage from "./page/LogInPage";
 import EditProfilePage from "./page/EditProfilePage";
 import { ConfigProvider, ThemeConfig } from "antd";
 import { UserProvider } from "./components/UserProvider";
+import ProjectsPage from "./page/ProjectsPage.tsx";
+import ProjectPage from "./page/ProjectPage.tsx";
 
 export const API_URL = "http://localhost:8080/api";
+
 const themeConfig: ThemeConfig = {
   token: {
     colorPrimary: "#997549",
@@ -33,10 +36,14 @@ createRoot(document.getElementById("root")!).render(
           <Routes>
             <Route element={<App />}>
               <Route index element={<HomePage />} />
-              <Route path="/signup" element={<SignUpPage />} />
-              <Route path="/login" element={<LogInPage />} />
-              <Route path="/todo" element={<TodoPage />} />
-              <Route path="/edit-profile" element={<EditProfilePage />} />
+              <Route path="signup" element={<SignUpPage />} />
+              <Route path="login" element={<LogInPage />} />
+              <Route path="todo" element={<TodoPage />} />
+              <Route path="edit-profile" element={<EditProfilePage />} />
+              <Route path="projects">
+                <Route path=":projectId" element={<ProjectPage />} />
+                <Route path="" element={<ProjectsPage />} />
+              </Route>
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>

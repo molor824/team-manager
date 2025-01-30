@@ -3,19 +3,17 @@ import Title from "antd/es/typography/Title";
 import { useUser } from "../components/UserProvider";
 import NonLogin from "../components/NonLogin";
 import { putApi } from "../tools/fetchApi";
-import { useState } from "react";
+import { useRequest } from "ahooks";
 
 export default function EditProfilePage() {
   const { user, token } = useUser();
-  const [loading, setLoading] = useState(false);
-  const handleSubmit = (values: any) => {
-    console.log(values);
-    setLoading(true);
-    putApi("/users/edit", values, token)
-      .then(console.log)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  };
+  const { loading, run } = useRequest(
+    (values: any) =>
+      putApi("/users/edit", values, token)
+        .then(console.log)
+        .catch(console.error),
+    { manual: true }
+  );
 
   if (!user) {
     return <NonLogin />;
@@ -28,7 +26,7 @@ export default function EditProfilePage() {
       <Form
         className="mt-8"
         layout="vertical"
-        onFinish={handleSubmit}
+        onFinish={run}
         disabled={loading}
       >
         <Form.Item

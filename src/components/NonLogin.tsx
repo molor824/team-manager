@@ -1,5 +1,5 @@
 import Title from "antd/es/typography/Title";
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
 export default function NonLogin() {
   return (

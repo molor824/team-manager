@@ -1,5 +1,5 @@
-import { Card, Tooltip } from "antd";
-import { CloseCircleOutlined } from "@ant-design/icons";
+import {Card, Tooltip} from "antd";
+import {CloseCircleOutlined} from "@ant-design/icons";
 
 interface Props {
   title: string;
@@ -9,11 +9,11 @@ interface Props {
 }
 
 export default function TaskCard({
-  title,
-  handleDelete,
-  index,
-  setActiveCard,
-}: Props) {
+                                   title,
+                                   handleDelete,
+                                   index,
+                                   setActiveCard,
+                                 }: Props) {
   return (
     <Card
       className="w-full min-w-[100px] min-h-[100px] border border-gray-300 rounded-lg cursor-grab shadow-md bg-white"

@@ -1,15 +1,17 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getApi } from "../tools/fetchApi";
+import { useRequest } from "ahooks";
 
 export type User = {
+  id: number;
   fullName: string;
   email: string;
   phoneNumber?: string;
 };
 export type UserInfo = {
   user?: User;
-  token: string;
-  setToken: (token: string) => void;
+  token?: string;
+  setToken: (token: string | undefined) => void;
 };
 
 const UserContext = createContext<UserInfo>({} as any);
@@ -17,36 +19,23 @@ const UserContext = createContext<UserInfo>({} as any);
 export function useUser() {
   return useContext(UserContext);
 }
+
 export function UserProvider({ children }: React.PropsWithChildren) {
-  const [user, setUser] = useState<User>();
-  const [userToken, _setUserToken] = useState<string>(
-    () => localStorage.getItem("token") || ""
+  const [userToken, setUserToken] = useState<string | undefined>(
+    () => localStorage.getItem("token") ?? undefined
   );
-  const setUserToken = (token: string) => {
-    if (token === userToken) return;
-
-    if (token === "") localStorage.removeItem("token");
-    else localStorage.setItem("token", token);
-    _setUserToken(token);
-    setUser(undefined);
-  };
-
   useEffect(() => {
-    if (userToken === "") return;
-
-    getApi("/users/me", userToken)
-      .then((user) => {
-        setUser({
-          fullName: user.fullName,
-          email: user.email,
-          phoneNumber: user.phoneNumber,
-        });
-      })
-      .catch((err) => {
-        console.error(err);
-        setUserToken("");
-      });
+    if (!userToken) localStorage.removeItem("token");
+    else localStorage.setItem("token", userToken);
   }, [userToken]);
+
+  const { data: user } = useRequest(
+    () => {
+      if (!userToken) return Promise.resolve(undefined);
+      return getApi("/users/me", userToken) as Promise<User>;
+    },
+    { refreshDeps: [userToken], onError: () => setUserToken(undefined) }
+  );
 
   return (
     <UserContext.Provider

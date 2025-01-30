@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Card } from "antd";
 import TaskColumn from "../components/TaskColumn";
 import {
-  ToolOutlined,
-  PlayCircleOutlined,
   CheckCircleOutlined,
+  PlayCircleOutlined,
+  ToolOutlined,
 } from "@ant-design/icons";
 import Title from "antd/es/typography/Title";
 
