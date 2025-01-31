@@ -1,21 +1,29 @@
-import { UserAddOutlined } from "@ant-design/icons";
-import { Button, List } from "antd";
+import { List } from "antd";
+import MemberInvite from "./MemberInvite";
+import MemberRemove from "./MemberRemove";
 
 type Props = {
+  projectId: number;
+  adminId: number;
   admin: boolean;
-  adminMember: {
-    id: number;
-    fullName: string;
-    email: string;
-  };
   members: {
     id: number;
     fullName: string;
     email: string;
   }[];
+  projectRequest: () => void;
 };
 
-export default function MembersList({ adminMember, admin, members }: Props) {
+export default function MembersList({
+  projectId,
+  adminId,
+  admin,
+  members,
+  projectRequest,
+}: Props) {
+  const adminMember = members.find(({ id }) => id === adminId);
+  if (!adminMember) throw new Error("adminId does not exist in members");
+
   return (
     <List
       itemLayout="vertical"
@@ -24,11 +32,7 @@ export default function MembersList({ adminMember, admin, members }: Props) {
         <div className="flex gap-4 justify-between">
           <h1 className="font-bold text-lg">Members</h1>
           {admin && (
-            <div className="flex gap-4">
-              <Button type="primary" icon={<UserAddOutlined />}>
-                Invite
-              </Button>
-            </div>
+            <MemberInvite projectId={projectId} onInvite={projectRequest} />
           )}
         </div>
       }
@@ -53,9 +57,11 @@ export default function MembersList({ adminMember, admin, members }: Props) {
                   <p>{email}</p>
                 </div>
                 {admin && (
-                  <Button danger type="text">
-                    Remove
-                  </Button>
+                  <MemberRemove
+                    projectId={projectId}
+                    memberId={id}
+                    onRemove={projectRequest}
+                  />
                 )}
               </div>
             </List.Item>

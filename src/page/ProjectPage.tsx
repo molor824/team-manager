@@ -46,16 +46,16 @@ export default function ProjectPage() {
     }
   );
   const {
-    run: deleteProject,
-    error: deleteError,
+    run: leaveProject,
+    error: leaveError,
     loading,
   } = useRequest(
     () =>
-      deleteApi(`/projects/${projectId}`, token)
+      deleteApi(`/projects/${projectId}/member/${user!.id}`, token)
         .then((_) => navigate("/projects"))
         .catch((_) =>
           Promise.reject(
-            new Error("Something went wrong trying to delete this project")
+            new Error("Something went wrong trying to leave this project")
           )
         ),
     { manual: true }
@@ -63,27 +63,28 @@ export default function ProjectPage() {
   if (!user) {
     return <NonLogin />;
   }
-  const adminMember = project?.members.find(({ id }) => id === project.adminId);
   const isProjectAdmin = project && user && project?.adminId === user?.id;
 
   return (
     <Card>
       {project ? (
         <>
-          {deleteError && <p className="text-red-500">{deleteError.message}</p>}
+          {leaveError && <p className="text-red-500">{leaveError.message}</p>}
           <div className="flex flex-col gap-8">
             <div className="flex flex-wrap gap-8">
               <ProjectInfo
                 admin={isProjectAdmin!}
                 name={project.name}
                 description={project.description}
-                onDelete={deleteProject}
+                onDelete={leaveProject}
                 loading={loading}
               />
               <MembersList
-                adminMember={adminMember!}
+                projectId={project.id}
+                adminId={project.adminId}
                 members={project.members}
                 admin={isProjectAdmin!}
+                projectRequest={refresh}
               />
             </div>
             <TasksList
