@@ -30,6 +30,11 @@ public class WorkController {
         return workService.createWork(dto);
     }
 
+    @PutMapping("/{workId}/project/{projectId}/status")
+    public void editWorkStatus(@PathVariable Long workId, @PathVariable Long projectId, @RequestParam String v) {
+        workService.editStatus(workId, projectId, v);
+    }
+
     @DeleteMapping("/{taskId}/project/{projectId}")
     public void deleteWork(@PathVariable Long taskId, @PathVariable Long projectId) {
         workService.deleteWorkByProjectAndId(projectId, taskId);

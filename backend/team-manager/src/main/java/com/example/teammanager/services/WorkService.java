@@ -78,6 +78,13 @@ public class WorkService {
         var works = project.getWorks();
         workRepository.deleteAll(works);
     }
+    @Transactional
+    public void editStatus(Long workId, Long projectId, String status) {
+        var project = projectService.getMemberProjectById(projectId);
+        var work = getWorkInProjectById(project, workId);
+        work.setStatus(status);
+        workRepository.save(work);
+    }
 
     private WorkDto toDto(Work work) {
         var user = work.getAssignedUser();
