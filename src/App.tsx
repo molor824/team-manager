@@ -33,6 +33,11 @@ const ROUTES = [
     icon: <SlidersFilled />,
     label: "Reports",
   },
+  {
+    key: "/task",
+    icon: <SlidersFilled />,
+    label: "Task",
+  },
 ];
 
 export default function App() {

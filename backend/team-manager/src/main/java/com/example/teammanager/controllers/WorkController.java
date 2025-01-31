@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/work")
+@RequestMapping("/api/works")
 public class WorkController {
     private final WorkService workService;
 
@@ -30,8 +30,8 @@ public class WorkController {
         return workService.createWork(dto);
     }
 
-    @DeleteMapping("/project/{projectId}/{taskId}")
-    public void deleteWork(@PathVariable Long projectId, @PathVariable Long taskId) {
+    @DeleteMapping("/{taskId}/project/{projectId}")
+    public void deleteWork(@PathVariable Long taskId, @PathVariable Long projectId) {
         workService.deleteWorkByProjectAndId(projectId, taskId);
     }
 }

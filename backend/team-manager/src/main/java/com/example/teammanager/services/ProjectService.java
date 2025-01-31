@@ -21,6 +21,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final UserService userService;
     private final ProjectMemberService projectMemberService;
+    private final WorkService workService;
 
     public Project createProject(ProjectDto projectDto) {
         if (projectRepository.existsByName(projectDto.name())) {
@@ -47,6 +48,7 @@ public class ProjectService {
         ).toList();
     }
 
+    @Transactional
     public Project getMemberProjectById(Long id) {
         var currentUser = userService.getCurrentUser();
         var project = projectRepository.findById(id).orElseThrow(() ->
@@ -58,7 +60,8 @@ public class ProjectService {
         return project;
     }
 
-    private Project getAdminProjectById(Long id) {
+    @Transactional
+    public Project getAdminProjectById(Long id) {
         var currentUser = userService.getCurrentUser();
         var project = projectRepository.findById(id).orElseThrow(() ->
                 ProjectNotFoundException.withId(id)
@@ -71,8 +74,9 @@ public class ProjectService {
 
     @Transactional
     public void deleteProject(Long id) {
-        var project = getAdminProjectById(id);
+        workService.deleteTasksInProject(id);
 
+        var project = getAdminProjectById(id);
         projectMemberService.deleteProject(project);
         projectRepository.deleteById(id);
     }
