@@ -5,6 +5,8 @@ import com.example.teammanager.entities.User;
 import com.example.teammanager.services.UserService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequestMapping("/api/users")
 @RestController
 public class UserController {
@@ -13,6 +15,11 @@ public class UserController {
     public UserController(
             UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping("/email")
+    public User withEmail(@RequestParam(value = "v") String email) {
+        return userService.getUserByEmail(email);
     }
 
     @GetMapping("/me")
