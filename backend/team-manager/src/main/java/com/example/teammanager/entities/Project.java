@@ -36,4 +36,9 @@ public class Project {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "admin_id")
     private User admin;
+
+    @JsonIgnore
+    @ToString.Exclude
+    @OneToMany(mappedBy = "project")
+    private Set<Work> works = new HashSet<>();
 }

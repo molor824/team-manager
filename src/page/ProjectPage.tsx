@@ -6,12 +6,22 @@ import { useRequest } from "ahooks";
 import MembersList from "../components/MembersList";
 import ProjectInfo from "../components/ProjectInfo";
 import NonLogin from "../components/NonLogin";
+import TasksList from "../components/TasksList";
 
+type Status = "0" | "50" | "100";
 type User = {
   id: number;
   fullName: string;
   email: string;
   phoneNumber: string | null;
+};
+type Work = {
+  id: number;
+  title: string;
+  description: string;
+  status: Status;
+  projectId: number;
+  assignedUserId: number;
 };
 type Project = {
   id: number;
@@ -19,12 +29,17 @@ type Project = {
   description: string;
   members: User[];
   adminId: number;
+  works: Work[];
 };
 export default function ProjectPage() {
   const { projectId } = useParams();
   const { token, user } = useUser();
   const navigate = useNavigate();
-  const { data: project, error } = useRequest(
+  const {
+    data: project,
+    error,
+    refresh,
+  } = useRequest(
     () => getApi(`/projects/${projectId}`, token) as Promise<Project>,
     {
       refreshDeps: [projectId, token],
@@ -56,18 +71,25 @@ export default function ProjectPage() {
       {project ? (
         <>
           {deleteError && <p className="text-red-500">{deleteError.message}</p>}
-          <div className="flex flex-wrap gap-8">
-            <ProjectInfo
-              admin={isProjectAdmin!}
-              name={project.name}
-              description={project.description}
-              onDelete={deleteProject}
-              loading={loading}
-            />
-            <MembersList
-              adminMember={adminMember!}
-              members={project.members}
-              admin={isProjectAdmin!}
+          <div className="flex flex-col gap-8">
+            <div className="flex flex-wrap gap-8">
+              <ProjectInfo
+                admin={isProjectAdmin!}
+                name={project.name}
+                description={project.description}
+                onDelete={deleteProject}
+                loading={loading}
+              />
+              <MembersList
+                adminMember={adminMember!}
+                members={project.members}
+                admin={isProjectAdmin!}
+              />
+            </div>
+            <TasksList
+              works={project.works}
+              refresh={refresh}
+              projectId={project.id}
             />
           </div>
         </>

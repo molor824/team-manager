@@ -2,10 +2,12 @@ package com.example.teammanager.controllers;
 
 import com.example.teammanager.dtos.ProjectDto;
 import com.example.teammanager.dtos.ProjectResponseDto;
+import com.example.teammanager.dtos.WorkDto;
 import com.example.teammanager.entities.Project;
 import com.example.teammanager.entities.ProjectMemberRelation;
-import com.example.teammanager.entities.User;
 import com.example.teammanager.services.ProjectService;
+import com.example.teammanager.services.WorkService;
+import lombok.AllArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,12 +15,10 @@ import java.util.List;
 
 @RequestMapping("/api/projects")
 @RestController
+@AllArgsConstructor
 public class ProjectController {
     private final ProjectService projectService;
-
-    public ProjectController(ProjectService projectService) {
-        this.projectService = projectService;
-    }
+    private final WorkService workService;
 
     @PostMapping
     public Project createProject(@RequestBody ProjectDto projectDto) {
@@ -34,7 +34,8 @@ public class ProjectController {
                 project.getName(),
                 project.getDescription(),
                 project.getMembers().stream().map(ProjectMemberRelation::getMember).toList(),
-                project.getAdmin().getId()
+                project.getAdmin().getId(),
+                workService.getWorkByProjectId(project.getId())
         );
     }
 

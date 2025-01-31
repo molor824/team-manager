@@ -13,6 +13,4 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
     List<Work> findByAssignedUserId(Long userId);
 
     Optional<Work> findByIdAndProjectId(Long taskId, Long projectId);
-
-
 }

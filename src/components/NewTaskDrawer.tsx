@@ -21,10 +21,12 @@ export default function NewTaskDrawer({ open, projectId, onClose }: Props) {
   const { token } = useUser();
   const { run, loading, error } = useRequest(
     (value: Omit<TaskForm, "projectId">) =>
-      postApi("/work", { ...value, projectId }, token)
+      postApi("/works", { ...value, projectId }, token)
         .then(() => onClose && onClose())
         .catch(() =>
-          Promise.reject(new Error(`Task with title "${value.title}" already exists`))
+          Promise.reject(
+            new Error(`Task with title "${value.title}" already exists`)
+          )
         ),
     { manual: true }
   );
@@ -33,11 +35,14 @@ export default function NewTaskDrawer({ open, projectId, onClose }: Props) {
     <Drawer open={open} onClose={onClose} title="Create New Task">
       <Form layout="vertical" disabled={loading} onFinish={run}>
         {error && <p className="text-red-500">{error.message}</p>}
-        
+
         <Form.Item
           name="title"
           label="Task Title"
-          rules={[{ min: 3, message: "Title must be at least 3 characters" }, { required: true }]}
+          rules={[
+            { min: 3, message: "Title must be at least 3 characters" },
+            { required: true },
+          ]}
         >
           <Input size="large" />
         </Form.Item>

@@ -14,7 +14,6 @@ import { ConfigProvider, ThemeConfig } from "antd";
 import { UserProvider } from "./components/UserProvider";
 import ProjectsPage from "./page/ProjectsPage.tsx";
 import ProjectPage from "./page/ProjectPage.tsx";
-import ProjectTasksPage from "./page/ProjectTasksPage.tsx";
 
 export const API_URL = "http://localhost:8080/api";
 
@@ -45,7 +44,6 @@ createRoot(document.getElementById("root")!).render(
                 <Route path=":projectId" element={<ProjectPage />} />
                 <Route path="" element={<ProjectsPage />} />
               </Route>
-              <Route path="task" element={<ProjectTasksPage/>} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>

@@ -10,6 +10,7 @@ public record ProjectResponseDto(
         @NonNull String name,
         String description,
         @NonNull List<User> members,
-        @NonNull Long adminId
+        @NonNull Long adminId,
+        @NonNull List<WorkDto> works
 ) {
 }
