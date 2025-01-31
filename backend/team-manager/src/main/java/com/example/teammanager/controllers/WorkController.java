@@ -20,6 +20,11 @@ public class WorkController {
         return workService.getWorkByProjectId(projectId);
     }
 
+    @GetMapping("/project/{projectId}/assigned")
+    public List<WorkDto> getAssignedWorkByProjectId(@PathVariable Long projectId) {
+        return workService.getAssignedWorkByProjectId(projectId);
+    }
+
     @GetMapping("/user/{userId}")
     public List<WorkDto> getWorkByAssignedUserId(@PathVariable Long userId) {
         return workService.getWorkByAssignedUserId(userId);

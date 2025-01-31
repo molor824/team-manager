@@ -4,13 +4,7 @@ import { deleteApi, putApi } from "../tools/fetchApi";
 import { useUser } from "./UserProvider";
 import { useState } from "react";
 import NewTaskDrawer from "./NewTaskDrawer";
-
-type Work = {
-  id: number;
-  title: string;
-  description: string;
-  status: string;
-};
+import { Work } from "../tools/model_types";
 
 type Props = {
   works: Work[];
@@ -18,7 +12,7 @@ type Props = {
   refresh: () => void;
 };
 
-export default function TasksList({ works, projectId, refresh }: Props) {
+export default function WorksList({ works, projectId, refresh }: Props) {
   const { token } = useUser();
   const { run, loading } = useRequest(
     async (workId: number) => {

@@ -6,31 +6,9 @@ import { useRequest } from "ahooks";
 import MembersList from "../components/MembersList";
 import ProjectInfo from "../components/ProjectInfo";
 import NonLogin from "../components/NonLogin";
-import TasksList from "../components/TasksList";
+import WorksList from "../components/WorksList";
+import { Project } from "../tools/model_types";
 
-type Status = "0" | "50" | "100";
-type User = {
-  id: number;
-  fullName: string;
-  email: string;
-  phoneNumber: string | null;
-};
-type Work = {
-  id: number;
-  title: string;
-  description: string;
-  status: Status;
-  projectId: number;
-  assignedUserId: number;
-};
-type Project = {
-  id: number;
-  name: string;
-  description: string;
-  members: User[];
-  adminId: number;
-  works: Work[];
-};
 export default function ProjectPage() {
   const { projectId } = useParams();
   const { token, user } = useUser();
@@ -87,7 +65,7 @@ export default function ProjectPage() {
                 projectRequest={refresh}
               />
             </div>
-            <TasksList
+            <WorksList
               works={project.works}
               refresh={refresh}
               projectId={project.id}
