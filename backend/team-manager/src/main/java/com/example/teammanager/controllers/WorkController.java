@@ -5,6 +5,7 @@ import com.example.teammanager.services.WorkService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/works")
@@ -28,6 +29,11 @@ public class WorkController {
     @PostMapping
     public WorkDto createWork(@RequestBody WorkDto dto) {
         return workService.createWork(dto);
+    }
+    @PutMapping("/{taskId}/project/{projectId}/assign")
+    public WorkDto assignUserToTask(@PathVariable Long taskId, @PathVariable Long projectId, @RequestBody Map<String, Long> body) {
+        Long userId = body.get("userId");
+        return workService.assignUserToTask(taskId, projectId, userId);
     }
 
     @DeleteMapping("/{taskId}/project/{projectId}")

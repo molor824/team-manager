@@ -24,9 +24,7 @@ export default function NewTaskDrawer({ open, projectId, onClose }: Props) {
       postApi("/works", { ...value, projectId }, token)
         .then(() => onClose && onClose())
         .catch(() =>
-          Promise.reject(
-            new Error(`Task with title "${value.title}" already exists`)
-          )
+          Promise.reject(new Error(`Task with title "${value.title}" already exists`))
         ),
     { manual: true }
   );
@@ -35,7 +33,6 @@ export default function NewTaskDrawer({ open, projectId, onClose }: Props) {
     <Drawer open={open} onClose={onClose} title="Create New Task">
       <Form layout="vertical" disabled={loading} onFinish={run}>
         {error && <p className="text-red-500">{error.message}</p>}
-
         <Form.Item
           name="title"
           label="Task Title"

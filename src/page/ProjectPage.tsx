@@ -21,7 +21,7 @@ type Work = {
   description: string;
   status: Status;
   projectId: number;
-  assignedUserId: number;
+  assignedUserId: number | null;
 };
 type Project = {
   id: number;
@@ -31,39 +31,35 @@ type Project = {
   adminId: number;
   works: Work[];
 };
+
 export default function ProjectPage() {
   const { projectId } = useParams();
   const { token, user } = useUser();
   const navigate = useNavigate();
-  const {
-    data: project,
-    error,
-    refresh,
-  } = useRequest(
+
+  const { data: project, error, refresh } = useRequest(
     () => getApi(`/projects/${projectId}`, token) as Promise<Project>,
-    {
-      refreshDeps: [projectId, token],
-    }
+    { refreshDeps: [projectId, token] }
   );
-  const {
-    run: leaveProject,
-    error: leaveError,
-    loading,
-  } = useRequest(
-    () =>
-      deleteApi(`/projects/${projectId}/member/${user!.id}`, token)
-        .then((_) => navigate("/projects"))
-        .catch((_) =>
-          Promise.reject(
-            new Error("Something went wrong trying to leave this project")
-          )
-        ),
+
+  const { run: leaveProject, error: leaveError, loading } = useRequest(
+    async () => {
+      try {
+        await deleteApi(`/projects/${projectId}/member/${user!.id}`, token);
+        navigate("/projects");
+      } catch {
+        throw new Error("Something went wrong trying to leave this project");
+      }
+    },
     { manual: true }
   );
+
   if (!user) {
     return <NonLogin />;
   }
-  const isProjectAdmin = project && user && project?.adminId === user?.id;
+
+  const isProjectAdmin = Boolean(project && user && project.adminId === user.id);
+
 
   return (
     <Card>
@@ -73,7 +69,7 @@ export default function ProjectPage() {
           <div className="flex flex-col gap-8">
             <div className="flex flex-wrap gap-8">
               <ProjectInfo
-                admin={isProjectAdmin!}
+                admin={isProjectAdmin}
                 name={project.name}
                 description={project.description}
                 onDelete={leaveProject}
@@ -83,7 +79,7 @@ export default function ProjectPage() {
                 projectId={project.id}
                 adminId={project.adminId}
                 members={project.members}
-                admin={isProjectAdmin!}
+                admin={isProjectAdmin}
                 projectRequest={refresh}
               />
             </div>
@@ -91,6 +87,8 @@ export default function ProjectPage() {
               works={project.works}
               refresh={refresh}
               projectId={project.id}
+              adminId={project.adminId} 
+              members={project.members} 
             />
           </div>
         </>
