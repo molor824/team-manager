@@ -4,7 +4,7 @@ export type Work = {
   description: string;
   status: string;
   projectId: number;
-  assignedUserId: number;
+  assignedUserId: number | null;
 };
 export type Project = {
   id: number;

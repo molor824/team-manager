@@ -117,4 +117,16 @@ public class WorkService {
                 user != null ? user.getId() : null
         );
     }
+    @Transactional
+    public WorkDto assignUserToTask(Long taskId, Long projectId, Long userId) {
+        var project = projectService.getAdminProjectById(projectId);
+        var work = getWorkInProjectById(project, taskId);
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        work.setAssignedUser(user);
+        workRepository.save(work);
+
+        return toDto(work);
+    }
 }
