@@ -43,9 +43,8 @@ export default function ProjectPage() {
     return <NonLogin />;
   }
 
-  const isProjectAdmin = Boolean(
-    project && user && project.adminId === user.id
-  );
+  const isProjectAdmin =
+    (project && user && project.adminId === user.id) || false;
 
   return (
     <Card>
@@ -73,7 +72,6 @@ export default function ProjectPage() {
               works={project.works}
               refresh={refresh}
               projectId={project.id}
-              adminId={project.adminId}
               members={project.members}
             />
           </div>

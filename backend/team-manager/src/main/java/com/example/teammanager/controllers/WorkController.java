@@ -36,8 +36,7 @@ public class WorkController {
         return workService.createWork(dto);
     }
     @PutMapping("/{taskId}/project/{projectId}/assign")
-    public WorkDto assignUserToTask(@PathVariable Long taskId, @PathVariable Long projectId, @RequestBody Map<String, Long> body) {
-        Long userId = body.get("userId");
+    public WorkDto assignUserToTask(@PathVariable Long taskId, @PathVariable Long projectId, @RequestBody Long userId) {
         return workService.assignUserToTask(taskId, projectId, userId);
     }
 

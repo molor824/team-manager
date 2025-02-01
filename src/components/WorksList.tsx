@@ -9,7 +9,6 @@ import { User, Work } from "../tools/model_types";
 type Props = {
   works: Work[];
   projectId: number;
-  adminId: number;
   members: User[];
   refresh: () => void;
 };
@@ -17,39 +16,28 @@ type Props = {
 export default function WorksList({
   works,
   projectId,
-  adminId,
   members,
   refresh,
 }: Props) {
   const { token } = useUser();
-  const [loadingTasks, setLoadingTasks] = useState<{ [key: number]: boolean }>(
-    {}
-  );
-  const [selectedUser, setSelectedUser] = useState<{
-    [key: number]: number | null;
-  }>({});
   const [taskDrawerOpen, setTaskDrawerOpen] = useState(false);
-
-  const assignUser = async (taskId: number) => {
-    if (!selectedUser[taskId]) return;
-    setLoadingTasks((prev) => ({ ...prev, [taskId]: true }));
-
-    try {
-      await putApi(
-        `/works/${taskId}/project/${projectId}/assign`,
-        { userId: selectedUser[taskId] },
-        token
-      );
-      message.success("User assigned successfully");
-      refresh();
-    } catch (error) {
-      console.error("Error assigning user:", error);
-      message.error("Failed to assign user");
-    } finally {
-      setLoadingTasks((prev) => ({ ...prev, [taskId]: false }));
-    }
-  };
-
+  const { run: assignMember, loading: assigning } = useRequest(
+    async (workId: number, memberId: number) => {
+      try {
+        await putApi(
+          `/works/${workId}/project/${projectId}/assign`,
+          memberId,
+          token
+        );
+        refresh();
+        message.success("User assigned successfully");
+      } catch (err) {
+        console.log(err);
+        message.error("Something went wrong");
+      }
+    },
+    { manual: true }
+  );
   const { run: deleteTask, loading: deleteLoading } = useRequest(
     async (workId: number) => {
       await deleteApi(`/works/${workId}/project/${projectId}`, token);
@@ -70,6 +58,63 @@ export default function WorksList({
     { manual: true }
   );
 
+  const listItem = (work: Work) => {
+    const assignedMember = members.find(
+      (member) => member.id === work.assignedUserId
+    );
+    return (
+      <List.Item
+        actions={[
+          <Select
+            key="select"
+            style={{ width: 150 }}
+            placeholder="Select User"
+            loading={assigning}
+            defaultValue={work.assignedUserId}
+            onChange={(value) => assignMember(work.id, value)}
+          >
+            {members.map((member) => (
+              <Select.Option key={member.id} value={member.id}>
+                {member.fullName}
+              </Select.Option>
+            ))}
+          </Select>,
+          <Select
+            defaultValue={work.status}
+            onChange={(value) => changeStatus(work.id, value)}
+            loading={statusLoading}
+          >
+            <Select.Option value="0">Not Started</Select.Option>
+            <Select.Option value="50">In Progress</Select.Option>
+            <Select.Option value="100">Completed</Select.Option>
+          </Select>,
+          <Button
+            danger
+            type="text"
+            loading={deleteLoading}
+            onClick={() => deleteTask(work.id)}
+          >
+            Delete
+          </Button>,
+        ]}
+      >
+        <List.Item.Meta
+          title={work.title}
+          description={
+            <>
+              <p>{work.description}</p>
+              <p>
+                {assignedMember
+                  ? `Assigned to ${assignedMember.fullName}`
+                  : "Unassigned"}
+              </p>
+            </>
+          }
+        />
+      </List.Item>
+    );
+  };
+
   return (
     <List
       header={
@@ -89,73 +134,7 @@ export default function WorksList({
         </div>
       }
       dataSource={works}
-      renderItem={(work) => (
-        <List.Item
-          actions={[
-            <Select
-              key="select"
-              style={{ width: 150 }}
-              placeholder="Select User"
-              onChange={(value) =>
-                setSelectedUser({ ...selectedUser, [work.id]: value })
-              }
-              value={selectedUser[work.id]}
-            >
-              {members
-                .filter((member) => member.id !== adminId) // Exclude admin
-                .map((member) => (
-                  <Select.Option key={member.id} value={member.id}>
-                    {member.fullName}
-                  </Select.Option>
-                ))}
-            </Select>,
-            <Button
-              key="assign"
-              type="primary"
-              onClick={() => assignUser(work.id)}
-              loading={loadingTasks[work.id]}
-            >
-              Assign
-            </Button>,
-            <Select
-              defaultValue={work.status}
-              onChange={(value) => changeStatus(work.id, value)}
-              loading={statusLoading}
-            >
-              <Select.Option value="0">Not Started</Select.Option>
-              <Select.Option value="50">In Progress</Select.Option>
-              <Select.Option value="100">Completed</Select.Option>
-            </Select>,
-            <Button
-              danger
-              type="text"
-              loading={deleteLoading}
-              onClick={() => deleteTask(work.id)}
-            >
-              Delete
-            </Button>,
-          ]}
-        >
-          <List.Item.Meta
-            title={work.title}
-            description={
-              <>
-                <p>{work.description}</p>
-                <p>
-                  {work.assignedUserId &&
-                  members.find((member) => member.id === work.assignedUserId)
-                    ? `Assigned to: ${
-                        members.find(
-                          (member) => member.id === work.assignedUserId
-                        )!.fullName
-                      }`
-                    : "Unassigned"}
-                </p>
-              </>
-            }
-          />
-        </List.Item>
-      )}
+      renderItem={listItem}
     />
   );
 }
