@@ -3,26 +3,19 @@ package com.example.teammanager.controllers;
 import com.example.teammanager.dtos.LoginResponseDto;
 import com.example.teammanager.dtos.LoginUserDto;
 import com.example.teammanager.dtos.RegisterUserDto;
-import com.example.teammanager.dtos.UserDto;
 import com.example.teammanager.services.AuthenticationService;
 import com.example.teammanager.services.JwtService;
-import com.example.teammanager.services.TeamService;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequestMapping("/api/auth")
 @RestController
 public class AuthenticationController {
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
-    private final TeamService teamService; // Inject TeamService for team-related operations
 
-    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, TeamService teamService // Constructor injection for TeamService
-    ) {
+    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
-        this.teamService = teamService;
     }
 
     @PostMapping("/signup")
@@ -36,22 +29,10 @@ public class AuthenticationController {
         return authenticationService.userExists(user); // Check if user exists
     }
 
-    @GetMapping("/{teamId}/users")
-    public List<UserDto> getUsersInTeam(@PathVariable Long teamId) {
-        // Fetch users in the specified team using TeamService
-        var users = teamService.getUsersInTeam(teamId);
-
-        // Map User entities to UserDto
-        // Ensure correct getters
-
-        return users.stream().map(user -> new UserDto(user.getId(), user.getEmail(), user.getFullName())) // Ensure correct getters
-                .toList();
-    }
-
     @PostMapping("/login")
     public LoginResponseDto login(@RequestBody LoginUserDto dto) {
         var authenticatedUser = authenticationService.authenticate(dto);
         var jwtToken = jwtService.generateToken(authenticatedUser);
-        return new LoginResponseDto(jwtToken);
+        return new LoginResponseDto(authenticatedUser.getId(), jwtToken);
     }
 }

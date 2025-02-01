@@ -1,5 +1,6 @@
 package com.example.teammanager.configs;
 
+import com.example.teammanager.exception.UserNotFoundException;
 import com.example.teammanager.services.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +21,13 @@ public class ApplicationConfiguration {
 
     @Bean
     UserDetailsService userDetailsService() {
-        return userService::tryGetUserFromEmail;
+        return email -> {
+            try {
+                return userService.getUserByEmail(email);
+            } catch (UserNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 
     @Bean

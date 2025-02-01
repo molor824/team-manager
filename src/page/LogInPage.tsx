@@ -1,27 +1,22 @@
 import { Button, Card, Form, Input, Space } from "antd";
-import { useState } from "react";
 import { postApi } from "../tools/fetchApi";
 import { useUser } from "../components/UserProvider";
 import { Link, useNavigate } from "react-router-dom";
+import { useRequest } from "ahooks";
 
 export default function LogInPage() {
-  const [loading, setLoading] = useState(false);
-  const [invalidAccount, setInvalidAccount] = useState(false);
   const { setToken } = useUser();
   const navigate = useNavigate();
-  const handleOnFinish = (value: any) => {
-    setLoading(true);
-    setInvalidAccount(false);
-    postApi("/auth/login", value)
-      .then((res) => {
-        setToken(res.token);
-        navigate("/");
-      })
-      .catch((_) => {
-        setLoading(false);
-        setInvalidAccount(true);
-      });
-  };
+  const { run, loading, error } = useRequest(
+    (value: any) =>
+      postApi("/auth/login", value)
+        .then((res) => {
+          setToken(res.token);
+          navigate("/");
+        })
+        .catch(() => Promise.reject(new Error("Invalid account or password!"))),
+    { manual: true }
+  );
 
   return (
     <Card className="max-w-[400px] mx-auto">
@@ -32,13 +27,11 @@ export default function LogInPage() {
           Sign Up
         </Link>
       </Space>
-      <p className="text-red-500" hidden={!invalidAccount}>
-        Invalid account or password!
-      </p>
+      {error && <p className="text-red-500">{error.message}</p>}
       <Form
         className="mt-8"
         layout="vertical"
-        onFinish={handleOnFinish}
+        onFinish={run}
         disabled={loading}
       >
         <Form.Item

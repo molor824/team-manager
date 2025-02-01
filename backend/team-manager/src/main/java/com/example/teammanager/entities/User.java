@@ -3,8 +3,7 @@ package com.example.teammanager.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.lang.NonNull;
@@ -20,6 +19,11 @@ import java.util.Set;
 @Table(name = "users")
 @Entity
 @Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(exclude = { "projects", "adminProjects" })
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -34,11 +38,12 @@ public class User implements UserDetails {
     @NotBlank
     private String email;
 
+    @JsonIgnore
     @Column(name = "password", nullable = false, length = 400)
     @NotBlank
     private String password;
 
-    @Column(name = "phone_number", nullable = false, length = 20)
+    @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
     @CreationTimestamp
@@ -51,8 +56,13 @@ public class User implements UserDetails {
 
     @JsonIgnore
     @ToString.Exclude
-    @ManyToMany(mappedBy = "users", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private Set<Team> teams = new HashSet<>();
+    @OneToMany(mappedBy = "member")
+    private Set<ProjectMemberRelation> projects = new HashSet<>();
+
+    @JsonIgnore
+    @ToString.Exclude
+    @OneToMany(mappedBy = "admin")
+    private Set<Project> adminProjects = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

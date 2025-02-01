@@ -3,8 +3,8 @@ package com.example.teammanager.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "No such user")
-public class UserNotFoundException extends BaseException {
+@ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "No such user")
+public class UserNotFoundException extends StatusException {
     public UserNotFoundException(String message) {
         super(message);
     }

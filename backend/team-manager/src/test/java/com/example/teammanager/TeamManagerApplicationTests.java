@@ -1,18 +1,14 @@
 package com.example.teammanager;
 
 import com.example.teammanager.controllers.AuthenticationController;
-import com.example.teammanager.controllers.TeamController;
+import com.example.teammanager.controllers.UserController;
 import com.example.teammanager.dtos.LoginUserDto;
 import com.example.teammanager.dtos.RegisterUserDto;
-import com.example.teammanager.dtos.TeamDto;
-import com.example.teammanager.dtos.UserDto;
-import com.example.teammanager.services.TeamService;
+import com.example.teammanager.dtos.ProjectDto;
+import com.example.teammanager.services.ProjectService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.io.IOException;
-import java.util.List;
 
 @SpringBootTest
 class TeamManagerApplicationTests {
@@ -20,10 +16,10 @@ class TeamManagerApplicationTests {
     private AuthenticationController authenticationController;
 
     @Autowired
-    private TeamController teamController;
+    private ProjectService projectService;
 
     @Autowired
-    private TeamService teamService;
+    private UserController userController;
 
     @Test
     void testAuthentication() {
@@ -41,50 +37,38 @@ class TeamManagerApplicationTests {
                 "test@mail.com",
                 "test_password_123"));
         assert response1 != null;
+
+        // Test authorization
+        var response2 = userController.authenticatedUser();
+        assert response2 != null;
+        assert response2.getEmail().equals("test@mail.com");
     }
 
     @Test
-    void testTeamCreationAndUserAssignment() throws IOException {
-        // Create a new team
-        TeamDto teamDto = new TeamDto();
-        teamDto.setName("Test Team");
-        teamDto.setDescription("This is a test team.");
-
-        var createdTeam = teamService.createTeam(teamDto);
-        assert createdTeam != null;
-        assert createdTeam.getName().equals("Test Team");
-        assert createdTeam.getDescription().equals("This is a test team.");
-
+    void testProjectCreation() {
         // Add a user to the team
-        var userResponse = authenticationController.signup(new RegisterUserDto(
+        var memberResponse = authenticationController.signup(new RegisterUserDto(
                 "user1@mail.com",
                 "User One",
                 "user_password_123",
-                null));
-        assert userResponse != null;
+                null
+        ));
 
-        var user = userResponse.getBody();
-        assert false;
+        // sign up
+        authenticationController.signup(new RegisterUserDto(
+                "admin@mail.com",
+                "Admin User",
+                "admin_password_123",
+                null
+        ));
 
-        var addedTeam = teamService.addUserToTeam(createdTeam.getId(), user.getId());
-        assert addedTeam != null;
-        assert addedTeam.getUsers().size() == 1;
+        // Create a new project
+        ProjectDto projectDto = new ProjectDto("Test project", "This is a test project.");
+        var projectResponse = projectService.createProject(projectDto);
 
-        // Check users in the team
-        var usersInTeamResponse = teamController.getUsersInTeam(createdTeam.getId());
-        assert usersInTeamResponse != null;
+        projectService.addMemberToProject(projectResponse.getId(), memberResponse.id());
 
-        List<UserDto> usersInTeam = usersInTeamResponse.getBody();
-        assert usersInTeam != null; // Ensure the list is not null
-        assert usersInTeam.size() == 1; // There should be exactly 1 user in the team
-
-        UserDto userDto = usersInTeam.get(0); // Get the first user in the team
-        assert userDto.getEmail().equals("user1@mail.com"); // Verify the email
-        assert userDto.getName().equals("User One"); // Verify the name
-
-        // Remove the user from the team
-        var updatedTeam = teamService.removeUserFromTeam(createdTeam.getId(), userDto.getId().intValue());
-        assert updatedTeam != null; // Ensure the team was updated successfully
-        assert updatedTeam.getUsers().isEmpty(); // Verify that the team has no users
+        var membersResponse = projectService.getMembersInProject(projectResponse.getId());
+        assert membersResponse.size() == 2;
     }
 }

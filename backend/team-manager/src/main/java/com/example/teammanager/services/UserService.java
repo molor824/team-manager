@@ -16,7 +16,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User getCurrentUser() throws UserNotFoundException {
+    public User getCurrentUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             throw new UserNotFoundException("Failed to find authenticated user");
@@ -25,11 +25,15 @@ public class UserService {
         return (User) authentication.getPrincipal();
     }
 
-    public User tryGetUserFromEmail(String email) throws UserNotFoundException {
+    public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> UserNotFoundException.withEmail(email));
     }
 
-    public void editProfile(EditProfileDto dto) throws UserNotFoundException {
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> UserNotFoundException.withId(id));
+    }
+
+    public void editProfile(EditProfileDto dto) {
         var user = getCurrentUser();
         user.setFullName(dto.fullName());
         user.setPhoneNumber(dto.phoneNumber());

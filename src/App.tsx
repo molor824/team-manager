@@ -1,4 +1,5 @@
 import {
+  DatabaseFilled,
   HomeFilled,
   MenuOutlined,
   ProfileFilled,
@@ -18,6 +19,11 @@ const ROUTES = [
     label: "Home",
   },
   {
+    key: "/projects",
+    icon: <DatabaseFilled />,
+    label: "Projects",
+  },
+  {
     key: "/todo",
     icon: <ProfileFilled />,
     label: "Todo",
@@ -26,6 +32,11 @@ const ROUTES = [
     key: "/report",
     icon: <SlidersFilled />,
     label: "Reports",
+  },
+  {
+    key: "/task",
+    icon: <SlidersFilled />,
+    label: "Task",
   },
 ];
 

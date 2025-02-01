@@ -2,16 +2,19 @@ package com.example.teammanager.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Table(name = "teams")
+@Table(name = "projects")
 @Entity
-@Data
-public class Team {
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(exclude = { "members", "admin" })
+public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
@@ -25,11 +28,17 @@ public class Team {
 
     @JsonIgnore
     @ToString.Exclude
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "user_team", // Join table name
-            joinColumns = @JoinColumn(name = "team_id"), // Foreign key for Team
-            inverseJoinColumns = @JoinColumn(name = "user_id") // Foreign key for User
-    )
-    private Set<User> users = new HashSet<>();
+    @OneToMany(mappedBy = "project")
+    private Set<ProjectMemberRelation> members = new HashSet<>();
+
+    @JsonIgnore
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "admin_id")
+    private User admin;
+
+    @JsonIgnore
+    @ToString.Exclude
+    @OneToMany(mappedBy = "project")
+    private Set<Work> works = new HashSet<>();
 }
