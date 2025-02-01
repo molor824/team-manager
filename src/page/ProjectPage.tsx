@@ -6,43 +6,28 @@ import { useRequest } from "ahooks";
 import MembersList from "../components/MembersList";
 import ProjectInfo from "../components/ProjectInfo";
 import NonLogin from "../components/NonLogin";
-import TasksList from "../components/TasksList";
-
-type Status = "0" | "50" | "100";
-type User = {
-  id: number;
-  fullName: string;
-  email: string;
-  phoneNumber: string | null;
-};
-type Work = {
-  id: number;
-  title: string;
-  description: string;
-  status: Status;
-  projectId: number;
-  assignedUserId: number | null;
-};
-type Project = {
-  id: number;
-  name: string;
-  description: string;
-  members: User[];
-  adminId: number;
-  works: Work[];
-};
+import WorksList from "../components/WorksList";
+import { Project } from "../tools/model_types";
 
 export default function ProjectPage() {
   const { projectId } = useParams();
   const { token, user } = useUser();
   const navigate = useNavigate();
 
-  const { data: project, error, refresh } = useRequest(
+  const {
+    data: project,
+    error,
+    refresh,
+  } = useRequest(
     () => getApi(`/projects/${projectId}`, token) as Promise<Project>,
     { refreshDeps: [projectId, token] }
   );
 
-  const { run: leaveProject, error: leaveError, loading } = useRequest(
+  const {
+    run: leaveProject,
+    error: leaveError,
+    loading,
+  } = useRequest(
     async () => {
       try {
         await deleteApi(`/projects/${projectId}/member/${user!.id}`, token);
@@ -58,8 +43,9 @@ export default function ProjectPage() {
     return <NonLogin />;
   }
 
-  const isProjectAdmin = Boolean(project && user && project.adminId === user.id);
-
+  const isProjectAdmin = Boolean(
+    project && user && project.adminId === user.id
+  );
 
   return (
     <Card>
@@ -83,12 +69,12 @@ export default function ProjectPage() {
                 projectRequest={refresh}
               />
             </div>
-            <TasksList
+            <WorksList
               works={project.works}
               refresh={refresh}
               projectId={project.id}
-              adminId={project.adminId} 
-              members={project.members} 
+              adminId={project.adminId}
+              members={project.members}
             />
           </div>
         </>

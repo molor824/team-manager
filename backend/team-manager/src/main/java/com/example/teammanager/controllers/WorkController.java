@@ -21,6 +21,11 @@ public class WorkController {
         return workService.getWorkByProjectId(projectId);
     }
 
+    @GetMapping("/project/{projectId}/assigned")
+    public List<WorkDto> getAssignedWorkByProjectId(@PathVariable Long projectId) {
+        return workService.getAssignedWorkByProjectId(projectId);
+    }
+
     @GetMapping("/user/{userId}")
     public List<WorkDto> getWorkByAssignedUserId(@PathVariable Long userId) {
         return workService.getWorkByAssignedUserId(userId);
@@ -34,6 +39,11 @@ public class WorkController {
     public WorkDto assignUserToTask(@PathVariable Long taskId, @PathVariable Long projectId, @RequestBody Map<String, Long> body) {
         Long userId = body.get("userId");
         return workService.assignUserToTask(taskId, projectId, userId);
+    }
+
+    @PutMapping("/{workId}/project/{projectId}/status")
+    public void editWorkStatus(@PathVariable Long workId, @PathVariable Long projectId, @RequestParam String v) {
+        workService.editStatus(workId, projectId, v);
     }
 
     @DeleteMapping("/{taskId}/project/{projectId}")

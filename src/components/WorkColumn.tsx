@@ -1,27 +1,23 @@
-import TaskCard from "./TaskCard";
+import WorkCard from "./WorkCard";
 import Title from "antd/es/typography/Title";
 import { Card } from "antd";
 import { ReactNode, useState } from "react";
-
-interface Task {
-  title: string; // Title of the task
-  status: string; // Status of the task (e.g., "todo", "doing", "done")
-}
+import { Work } from "../tools/model_types";
 
 interface Props {
   title: string;
   icon: ReactNode; // Change here to React.ReactNode
-  tasks: Task[];
+  works: Work[];
   status: string;
-  handleDelete: (index: number) => void;
-  setActiveCard: (index: number | null) => void;
+  handleDelete: (id: number) => void;
+  setActiveCard: (id: number | null) => void;
   onDrop: (status: string) => void;
 }
 
-export default function TaskColumn({
+export default function WorkColumn({
   title,
   icon,
-  tasks,
+  works,
   status,
   handleDelete,
   setActiveCard,
@@ -49,14 +45,14 @@ export default function TaskColumn({
       </div>
 
       <div className="flex flex-col items-stretch gap-4">
-        {tasks.map(
-          (task, index) =>
+        {works.map(
+          (task) =>
             task.status === status && (
-              <TaskCard
-                key={index}
+              <WorkCard
+                key={task.id}
                 title={task.title}
                 handleDelete={handleDelete}
-                index={index}
+                id={task.id}
                 setActiveCard={setActiveCard}
               />
             )

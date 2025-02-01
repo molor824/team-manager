@@ -4,32 +4,30 @@ import { Button, Select, List, message } from "antd";
 import { putApi, deleteApi } from "../tools/fetchApi";
 import { useUser } from "./UserProvider";
 import NewTaskDrawer from "./NewTaskDrawer";
-
-type Member = {
-  id: number;
-  fullName: string;
-  email: string;
-};
-
-type Work = {
-  id: number;
-  title: string;
-  description: string;
-  assignedUserId: number | null;
-};
+import { User, Work } from "../tools/model_types";
 
 type Props = {
   works: Work[];
   projectId: number;
   adminId: number;
-  members: Member[];
+  members: User[];
   refresh: () => void;
 };
 
-export default function TasksList({ works, projectId, adminId, members, refresh }: Props) {
+export default function WorksList({
+  works,
+  projectId,
+  adminId,
+  members,
+  refresh,
+}: Props) {
   const { token } = useUser();
-  const [loadingTasks, setLoadingTasks] = useState<{ [key: number]: boolean }>({});
-  const [selectedUser, setSelectedUser] = useState<{ [key: number]: number | null }>({});
+  const [loadingTasks, setLoadingTasks] = useState<{ [key: number]: boolean }>(
+    {}
+  );
+  const [selectedUser, setSelectedUser] = useState<{
+    [key: number]: number | null;
+  }>({});
   const [taskDrawerOpen, setTaskDrawerOpen] = useState(false);
 
   const assignUser = async (taskId: number) => {
@@ -37,7 +35,11 @@ export default function TasksList({ works, projectId, adminId, members, refresh 
     setLoadingTasks((prev) => ({ ...prev, [taskId]: true }));
 
     try {
-      await putApi(`/works/${taskId}/project/${projectId}/assign`, { userId: selectedUser[taskId] }, token);
+      await putApi(
+        `/works/${taskId}/project/${projectId}/assign`,
+        { userId: selectedUser[taskId] },
+        token
+      );
       message.success("User assigned successfully");
       refresh();
     } catch (error) {
@@ -52,6 +54,17 @@ export default function TasksList({ works, projectId, adminId, members, refresh 
     async (workId: number) => {
       await deleteApi(`/works/${workId}/project/${projectId}`, token);
       message.success("Task deleted successfully");
+      refresh();
+    },
+    { manual: true }
+  );
+  const { run: changeStatus, loading: statusLoading } = useRequest(
+    async (workId: number, status: string) => {
+      await putApi(
+        `/works/${workId}/project/${projectId}/status?v=${status}`,
+        undefined,
+        token
+      );
       refresh();
     },
     { manual: true }
@@ -76,15 +89,17 @@ export default function TasksList({ works, projectId, adminId, members, refresh 
         </div>
       }
       dataSource={works}
-      renderItem={(task) => (
+      renderItem={(work) => (
         <List.Item
           actions={[
             <Select
               key="select"
               style={{ width: 150 }}
               placeholder="Select User"
-              onChange={(value) => setSelectedUser({ ...selectedUser, [task.id]: value })}
-              value={selectedUser[task.id]}
+              onChange={(value) =>
+                setSelectedUser({ ...selectedUser, [work.id]: value })
+              }
+              value={selectedUser[work.id]}
             >
               {members
                 .filter((member) => member.id !== adminId) // Exclude admin
@@ -94,22 +109,47 @@ export default function TasksList({ works, projectId, adminId, members, refresh 
                   </Select.Option>
                 ))}
             </Select>,
-            <Button key="assign" type="primary" onClick={() => assignUser(task.id)} loading={loadingTasks[task.id]}>
+            <Button
+              key="assign"
+              type="primary"
+              onClick={() => assignUser(work.id)}
+              loading={loadingTasks[work.id]}
+            >
               Assign
             </Button>,
-            <Button key="delete" danger loading={deleteLoading} onClick={() => deleteTask(task.id)}>
+            <Select
+              defaultValue={work.status}
+              onChange={(value) => changeStatus(work.id, value)}
+              loading={statusLoading}
+            >
+              <Select.Option value="0">Not Started</Select.Option>
+              <Select.Option value="50">In Progress</Select.Option>
+              <Select.Option value="100">Completed</Select.Option>
+            </Select>,
+            <Button
+              danger
+              type="text"
+              loading={deleteLoading}
+              onClick={() => deleteTask(work.id)}
+            >
               Delete
             </Button>,
           ]}
         >
           <List.Item.Meta
-            title={task.title}
+            title={work.title}
             description={
               <>
-                <p>{task.description}</p>
+                <p>{work.description}</p>
                 <p>
-                  Assigned to:{" "}
-                  {task.assignedUserId ? members.find((user) => user.id === task.assignedUserId)?.fullName : "Unassigned"}
+                  {work.assignedUserId &&
+                  members.find((member) => member.id === work.assignedUserId)
+                    ? `Assigned to: ${
+                        members.find(
+                          (member) => member.id === work.assignedUserId
+                        )!.fullName
+                      }`
+                    : "Unassigned"}
                 </p>
               </>
             }
