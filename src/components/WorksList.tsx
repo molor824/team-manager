@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRequest } from "ahooks";
-import { Button, Select, List, message } from "antd";
+import { Button, Select, List } from "antd";
 import { putApi, deleteApi } from "../tools/fetchApi";
 import { useUser } from "./UserProvider";
 import NewTaskDrawer from "./NewTaskDrawer";
@@ -20,20 +20,18 @@ export default function WorksList({
   refresh,
 }: Props) {
   const { token } = useUser();
-  const [taskDrawerOpen, setTaskDrawerOpen] = useState(false);
+  const [workDrawerOpen, setWorkDrawerOpen] = useState(false);
   const { run: assignMember, loading: assigning } = useRequest(
     async (workId: number, memberId: number) => {
       try {
         await putApi(
-          `/works/${workId}/project/${projectId}/assign`,
-          memberId,
+          `/works/${workId}/project/${projectId}/assign?v=${memberId}`,
+          undefined,
           token
         );
         refresh();
-        message.success("User assigned successfully");
       } catch (err) {
         console.log(err);
-        message.error("Something went wrong");
       }
     },
     { manual: true }
@@ -41,7 +39,6 @@ export default function WorksList({
   const { run: deleteTask, loading: deleteLoading } = useRequest(
     async (workId: number) => {
       await deleteApi(`/works/${workId}/project/${projectId}`, token);
-      message.success("Task deleted successfully");
       refresh();
     },
     { manual: true }
@@ -64,6 +61,7 @@ export default function WorksList({
     );
     return (
       <List.Item
+        key={work.id.toString()}
         actions={[
           <Select
             key="select"
@@ -120,21 +118,21 @@ export default function WorksList({
       header={
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Tasks</h1>
-          <Button type="primary" onClick={() => setTaskDrawerOpen(true)}>
+          <Button type="primary" onClick={() => setWorkDrawerOpen(true)}>
             New Task
           </Button>
           <NewTaskDrawer
-            open={taskDrawerOpen}
+            open={workDrawerOpen}
             projectId={projectId}
             onClose={() => {
-              setTaskDrawerOpen(false);
+              setWorkDrawerOpen(false);
               refresh();
             }}
           />
         </div>
       }
-      dataSource={works}
-      renderItem={listItem}
-    />
+    >
+      {works.map(listItem)}
+    </List>
   );
 }

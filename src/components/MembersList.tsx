@@ -11,7 +11,7 @@ type Props = {
     fullName: string;
     email: string;
   }[];
-  projectRequest: () => void;
+  refresh: () => void;
 };
 
 export default function MembersList({
@@ -19,7 +19,7 @@ export default function MembersList({
   adminId,
   admin,
   members,
-  projectRequest,
+  refresh,
 }: Props) {
   const adminMember = members.find(({ id }) => id === adminId);
   if (!adminMember) throw new Error("adminId does not exist in members");
@@ -31,9 +31,7 @@ export default function MembersList({
       header={
         <div className="flex gap-4 justify-between">
           <h1 className="font-bold text-lg">Members</h1>
-          {admin && (
-            <MemberInvite projectId={projectId} onInvite={projectRequest} />
-          )}
+          {admin && <MemberInvite projectId={projectId} onInvite={refresh} />}
         </div>
       }
       className="flex-1 min-w-[300px]"
@@ -50,7 +48,7 @@ export default function MembersList({
       {members.map(
         ({ id, fullName, email }) =>
           id !== adminMember.id && (
-            <List.Item>
+            <List.Item key={id}>
               <div className="flex justify-between">
                 <div className="flex flex-col">
                   <h1 className="text-lg">{fullName}</h1>
@@ -60,7 +58,7 @@ export default function MembersList({
                   <MemberRemove
                     projectId={projectId}
                     memberId={id}
-                    onRemove={projectRequest}
+                    onRemove={refresh}
                   />
                 )}
               </div>

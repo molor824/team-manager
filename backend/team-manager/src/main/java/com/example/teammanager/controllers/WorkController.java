@@ -1,11 +1,11 @@
 package com.example.teammanager.controllers;
 
 import com.example.teammanager.dtos.WorkDto;
+import com.example.teammanager.exception.InvalidQueryException;
 import com.example.teammanager.services.WorkService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/works")
@@ -35,9 +35,14 @@ public class WorkController {
     public WorkDto createWork(@RequestBody WorkDto dto) {
         return workService.createWork(dto);
     }
-    @PutMapping("/{taskId}/project/{projectId}/assign")
-    public WorkDto assignUserToTask(@PathVariable Long taskId, @PathVariable Long projectId, @RequestBody Long userId) {
-        return workService.assignUserToTask(taskId, projectId, userId);
+
+    @PutMapping("/{workId}/project/{projectId}/assign")
+    public WorkDto assignUserToTask(@PathVariable Long workId, @PathVariable Long projectId, @RequestParam String v) {
+        try {
+            return workService.assignUserToTask(workId, projectId, Long.parseUnsignedLong(v));
+        } catch (NumberFormatException e) {
+            throw new InvalidQueryException();
+        }
     }
 
     @PutMapping("/{workId}/project/{projectId}/status")
@@ -45,8 +50,8 @@ public class WorkController {
         workService.editStatus(workId, projectId, v);
     }
 
-    @DeleteMapping("/{taskId}/project/{projectId}")
-    public void deleteWork(@PathVariable Long taskId, @PathVariable Long projectId) {
-        workService.deleteWorkByProjectAndId(projectId, taskId);
+    @DeleteMapping("/{workId}/project/{projectId}")
+    public void deleteWork(@PathVariable Long workId, @PathVariable Long projectId) {
+        workService.deleteWorkByProjectAndId(projectId, workId);
     }
 }

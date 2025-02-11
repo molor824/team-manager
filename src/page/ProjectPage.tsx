@@ -65,7 +65,7 @@ export default function ProjectPage() {
                 adminId={project.adminId}
                 members={project.members}
                 admin={isProjectAdmin}
-                projectRequest={refresh}
+                refresh={refresh}
               />
             </div>
             <WorksList
