@@ -1,5 +1,4 @@
 import { FormMethod } from "react-router-dom";
-import { API_URL } from "../main";
 
 function createHeaders(token?: string | null) {
   let headers = { "Content-Type": "application/json" } as Record<
@@ -16,7 +15,7 @@ export async function fetchApi(
   body?: any,
   token?: string | null
 ) {
-  return fetch(API_URL + url, {
+  return fetch(`/api${url}`, {
     method,
     headers: createHeaders(token),
     body: body && JSON.stringify(body),

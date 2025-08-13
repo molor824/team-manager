@@ -1,0 +1,46 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: team-manager-frontend
+    ports:
+      - "4173:4173"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+    environment:
+      BACKEND_URL: http://backend:8080
+  backend:
+    build:
+      context: ./backend/team-manager
+      dockerfile: Dockerfile
+    container_name: team-manager-backend
+    networks:
+      - app-network
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/team_manager_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 0824
+  db:
+    image: postgres:15
+    container_name: team-manager-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 0824
+      POSTGRES_DB: team_manager_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-data:

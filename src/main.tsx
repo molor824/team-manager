@@ -15,8 +15,6 @@ import { UserProvider } from "./components/UserProvider";
 import ProjectsPage from "./page/ProjectsPage.tsx";
 import ProjectPage from "./page/ProjectPage.tsx";
 
-export const API_URL = "http://localhost:8080/api";
-
 const themeConfig: ThemeConfig = {
   token: {
     colorPrimary: "#997549",
